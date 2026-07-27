@@ -1,0 +1,1690 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>REPORTES SIP - CyberTilines</title>
+    <link rel="stylesheet" href="paginaProyecto_CYBERTILINES.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+      #pagina-protegida,
+      #pantalla-login {
+        display: none;
+      }
+
+      .login-fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(-45deg, #0f172a, #1e293b, #000000, #172554);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .login-btn {
+        background-color: #ffbf00 !important;
+        color: #0f172a !important;
+        border: 2px solid #ffbf00;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-family: "Montserrat", sans-serif;
+        font-weight: 800;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .login-btn:hover {
+        background-color: #e6ac00 !important;
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(255, 191, 0, 0.4);
+      }
+
+      .modal-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        animation: fadeInScale 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        width: 100%;
+        max-width: 450px;
+      }
+
+      @keyframes fadeInScale {
+        from {
+          opacity: 0;
+          transform: scale(0.9) translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      .registro-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+        opacity: 0;
+        animation: slideInRight 0.5s ease forwards;
+      }
+
+      .input-group:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+      .input-group:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .submit-btn {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 191, 0, 0.4);
+        filter: brightness(1.1);
+      }
+
+      @keyframes pulseTextIndex {
+        0% {
+          opacity: 0.6;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      @keyframes cyberpunkLoadingIndex {
+        0% {
+          left: -100%;
+        }
+        50% {
+          left: 0;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+
+      .hamburger-btn {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background-color: #ffcc00;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 5px;
+        padding: 12px;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+        animation: hamburguerPulse 2.5s infinite;
+      }
+      @keyframes hamburguerPulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.45);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(255, 204, 0, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(255, 204, 0, 0);
+        }
+      }
+      .hamburger-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 18px rgba(255, 204, 0, 0.5);
+        animation: none;
+      }
+      .hamburger-btn .bar {
+        width: 100%;
+        height: 3px;
+        background-color: #000c1a;
+        border-radius: 3px;
+        transform-origin: center;
+      }
+
+      .nav-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 4, 10, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 9000;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.35s ease,
+          visibility 0.35s ease;
+      }
+      .nav-overlay.is-open {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .nav-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        background: #000c1a;
+        border-right: 2px solid #ffcc00;
+        z-index: 9100;
+        display: flex;
+        flex-direction: column;
+        transform: translateX(-100%);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+      }
+      .nav-panel.is-open {
+        transform: translateX(0);
+      }
+      .nav-panel-topbar {
+        height: 4px;
+        background: linear-gradient(90deg, #ffcc00, transparent);
+        flex-shrink: 0;
+      }
+      .nav-panel-header {
+        padding: 28px 28px 20px;
+        border-bottom: 1px solid rgba(255, 204, 0, 0.15);
+        flex-shrink: 0;
+      }
+      .nav-panel-header > span {
+        font-family: "Montserrat", sans-serif;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 3px;
+        color: rgba(255, 204, 0, 0.5);
+        text-transform: uppercase;
+      }
+      .nav-panel-title {
+        font-family: "Montserrat", sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 1px;
+        margin-top: 4px;
+      }
+      .nav-panel-title .gold {
+        color: #ffcc00;
+      }
+
+      .nav-menu-list {
+        list-style: none;
+        padding: 20px 0;
+        flex: 1;
+        overflow-y: auto;
+      }
+      .nav-menu-list li {
+        opacity: 0;
+        transform: translateX(-20px);
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+      }
+      .nav-panel.is-open .nav-menu-list li {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      .nav-panel.is-open .nav-menu-list li:nth-child(1) {
+        transition-delay: 0.08s;
+      }
+      .nav-panel.is-open .nav-menu-list li:nth-child(2) {
+        transition-delay: 0.14s;
+      }
+      .nav-panel.is-open .nav-menu-list li:nth-child(3) {
+        transition-delay: 0.2s;
+      }
+      .nav-panel.is-open .nav-menu-list li:nth-child(4) {
+        transition-delay: 0.26s;
+      }
+
+      .nav-menu-link {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 28px;
+        text-decoration: none;
+        font-family: "Montserrat", sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: #fff;
+        text-transform: uppercase;
+        transition: all 0.25s ease;
+        border-left: 3px solid transparent;
+      }
+      .nav-menu-link:hover {
+        color: #ffcc00;
+        background: rgba(255, 204, 0, 0.06);
+        border-left-color: #ffcc00;
+        padding-left: 32px;
+      }
+      .nav-menu-link .nav-icon {
+        font-size: 18px;
+        width: 22px;
+        text-align: center;
+        flex-shrink: 0;
+      }
+      .nav-menu-link .nav-arrow {
+        margin-left: auto;
+        font-size: 12px;
+        opacity: 0;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+      }
+      .nav-menu-link:hover .nav-arrow {
+        opacity: 1;
+        transform: translateX(4px);
+      }
+
+      .nav-separator {
+        height: 1px;
+        background: rgba(255, 204, 0, 0.12);
+        margin: 8px 28px;
+      }
+
+      .nav-panel-footer {
+        padding: 20px 28px;
+        border-top: 1px solid rgba(255, 204, 0, 0.12);
+        flex-shrink: 0;
+      }
+      .nav-brand-text {
+        font-family: "Montserrat", sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: rgba(255, 255, 255, 0.35);
+        text-transform: uppercase;
+        line-height: 1.5;
+      }
+
+      .nav-corner-deco {
+        position: absolute;
+        bottom: 70px;
+        right: 0;
+        width: 60px;
+        height: 60px;
+        opacity: 0.15;
+        pointer-events: none;
+      }
+
+      .anon-check-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 4px 0 18px;
+        user-select: none;
+      }
+      .anon-check-row input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #ffcc00;
+        cursor: pointer;
+      }
+      .anon-check-row label {
+        color: #ccc;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      #reporteMsg {
+        min-height: 20px;
+        margin-top: 10px;
+        font-weight: 600;
+        text-align: center;
+        font-size: 14px;
+      }
+      #reporteMsg.ok {
+        color: #4dff88;
+      }
+      #reporteMsg.err {
+        color: #ff4c4c;
+      }
+
+      .leaderboard-section {
+        margin: 60px 0;
+      }
+      .leaderboard-section h2 {
+        color: #ffcc00;
+        font-family: "Montserrat", sans-serif;
+        margin-bottom: 6px;
+      }
+      .leaderboard-section .subtext {
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+
+      .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 204, 0, 0.15);
+        border-radius: 10px;
+        overflow: hidden;
+        display: block;
+      }
+      .leaderboard-table thead,
+      .leaderboard-table tbody {
+        display: block;
+        width: 100%;
+      }
+      .leaderboard-table tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+      }
+      .leaderboard-table th:nth-child(1),
+      .leaderboard-table td:nth-child(1) {
+        width: 45%;
+      }
+      .leaderboard-table th:nth-child(2),
+      .leaderboard-table td:nth-child(2) {
+        width: 30%;
+      }
+      .leaderboard-table th:nth-child(3),
+      .leaderboard-table td:nth-child(3) {
+        width: 25%;
+      }
+      .leaderboard-table th {
+        background: rgba(255, 204, 0, 0.08);
+        color: #ffcc00;
+        text-transform: uppercase;
+        font-family: "Montserrat", sans-serif;
+        font-size: 11px;
+        letter-spacing: 1px;
+        padding: 12px 16px;
+        text-align: left;
+      }
+      .leaderboard-table td {
+        padding: 12px 16px;
+        color: #eee;
+        font-size: 14px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .leaderboard-table tr:hover td {
+        background: rgba(255, 204, 0, 0.04);
+      }
+      .leaderboard-table tbody {
+        max-height: 208px;
+        overflow-y: auto;
+      }
+      .leaderboard-table tbody::-webkit-scrollbar {
+        width: 8px;
+      }
+      .leaderboard-table tbody::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .leaderboard-table tbody::-webkit-scrollbar-thumb {
+        background: rgba(255, 204, 0, 0.35);
+        border-radius: 8px;
+      }
+      .leaderboard-table tbody::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 204, 0, 0.55);
+      }
+      .autor-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        white-space: nowrap;
+      }
+      .autor-avatar,
+      .autor-avatar-placeholder {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        object-fit: cover;
+      }
+      .autor-avatar {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .autor-avatar-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+      }
+      .autor-avatar-placeholder svg {
+        width: 16px;
+        height: 16px;
+        opacity: 0.4;
+      }
+      .autor-username {
+        color: rgba(255, 204, 0, 0.75);
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .badge-anonimo {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #aaa;
+        font-size: 11px;
+      }
+      .badge-destacado {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 20px;
+        background: rgba(255, 204, 0, 0.15);
+        color: #ffcc00;
+        font-size: 11px;
+        margin-left: 6px;
+      }
+      .leaderboard-empty {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 14px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      #mis-reportes-screen,
+      #report-screen,
+      #soporte-screen {
+        display: none;
+      }
+      #mis-reportes-screen.is-open,
+      #report-screen.is-open,
+      #soporte-screen.is-open {
+        display: flex;
+        position: fixed;
+        inset: 0;
+        z-index: 9500;
+        background: rgba(0, 4, 10, 0.75);
+        backdrop-filter: blur(6px);
+        justify-content: center;
+        align-items: flex-start;
+        padding: 60px 20px;
+        overflow-y: auto;
+      }
+      .mis-reportes-list {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+      .mi-reporte-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 204, 0, 0.15);
+        border-radius: 10px;
+        padding: 14px 18px;
+      }
+      .mi-reporte-card h4 {
+        color: #ffcc00;
+        font-family: "Montserrat", sans-serif;
+        font-size: 15px;
+        margin-bottom: 4px;
+      }
+      .mi-reporte-card p {
+        color: #ccc;
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      .mi-reporte-card .meta {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 11px;
+      }
+      .mi-reporte-card a.archivo-link {
+        color: #4da3ff;
+        font-size: 12px;
+        text-decoration: underline;
+      }
+
+      .soporte-modal {
+        padding: 70px;
+        width: 92vw;
+        max-width: 1100px;
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .soporte-modal h2 {
+        font-size: 42px;
+      }
+      .soporte-content {
+        display: flex;
+        align-items: center;
+        gap: 50px;
+        margin-top: 50px;
+        flex-wrap: wrap;
+      }
+      .soporte-avatar {
+        width: 220px;
+        height: 220px;
+        border-radius: 26px;
+        object-fit: cover;
+        border: 1px solid rgba(255, 204, 0, 0.25);
+        background: rgba(255, 255, 255, 0.05);
+        flex-shrink: 0;
+      }
+      .soporte-info h3 {
+        color: #ffcc00;
+        font-family: "Montserrat", sans-serif;
+        font-size: 36px;
+        margin-bottom: 18px;
+        letter-spacing: 0.5px;
+      }
+      .soporte-info p {
+        color: #eee;
+        font-size: 24px;
+        margin: 10px 0;
+      }
+      .soporte-info p strong {
+        color: #ccc;
+        font-weight: 600;
+      }
+      .soporte-nota {
+        margin-top: 45px;
+        padding: 26px 30px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 18px;
+        font-style: italic;
+        line-height: 1.7;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <nav class="nav-panel" id="navPanel" aria-label="Menú principal">
+      <div class="nav-panel-topbar"></div>
+      <div class="nav-panel-header">
+        <span>// NAVEGACIÓN</span>
+        <div class="nav-panel-title">
+          CYBER<span class="gold">TILINES</span>
+        </div>
+      </div>
+      <ul class="nav-menu-list">
+        <li>
+          <a href="cuenta.html" class="nav-menu-link"
+            >Cuenta<span class="nav-arrow">›</span></a
+          >
+        </li>
+        <li>
+          <a href="#" class="nav-menu-link" id="abrirMisReportes"
+            >Tus Reportes<span class="nav-arrow">›</span></a
+          >
+        </li>
+        <li>
+          <a href="#" class="nav-menu-link" id="abrirSoporte"
+            >Soporte<span class="nav-arrow">›</span></a
+          >
+        </li>
+      </ul>
+      <svg
+        class="nav-corner-deco"
+        viewBox="0 0 60 60"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M 60 30 L 30 60"
+          stroke="#ffcc00"
+          stroke-width="3"
+          stroke-linecap="square"
+        />
+        <path
+          d="M 15 60 L 34 41"
+          stroke="#ffcc00"
+          stroke-width="3"
+          stroke-linecap="square"
+        />
+        <path
+          d="M 46 29 L 60 15"
+          stroke="#ffcc00"
+          stroke-width="3"
+          stroke-linecap="square"
+        />
+      </svg>
+      <div class="nav-panel-footer">
+        <div class="nav-brand-text">CyberTilines® — Reportes SIP©</div>
+      </div>
+    </nav>
+
+    <div
+      id="guard-loading-screen"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #0d0d13;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: &quot;Montserrat&quot;, sans-serif;
+        color: #ffcc00;
+        letter-spacing: 2px;
+        transition:
+          opacity 0.4s ease,
+          visibility 0.4s ease;
+        box-sizing: border-box;
+      "
+    >
+      <div
+        style="
+          font-size: 14px;
+          font-weight: 800;
+          margin-bottom: 15px;
+          text-transform: uppercase;
+          text-shadow: 0 0 8px rgba(255, 204, 0, 0.6);
+          animation: pulseTextIndex 1.5s infinite alternate;
+        "
+      >
+        SISTEMA // VERIFICANDO CREDENCIALES...
+      </div>
+      <div
+        style="
+          width: 60%;
+          max-width: 300px;
+          height: 4px;
+          background: rgba(255, 204, 0, 0.1);
+          position: relative;
+          overflow: hidden;
+          border: 1px solid rgba(255, 204, 0, 0.3);
+        "
+      >
+        <div
+          style="
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #ffcc00;
+            box-shadow: 0 0 10px #ffcc00;
+            animation: cyberpunkLoadingIndex 2s infinite linear;
+          "
+        ></div>
+      </div>
+      <div
+        style="
+          font-family: &quot;Open Sans&quot;, sans-serif;
+          font-size: 10px;
+          color: rgba(255, 204, 0, 0.6);
+          margin-top: 10px;
+          font-weight: 600;
+        "
+      >
+        SINCRO_AUTH_INITIAL_CHECK: OK
+      </div>
+    </div>
+
+    <div id="pantalla-login" class="login-fullscreen">
+      <div class="bg-text-container">
+        <div class="scrolling-text">
+          <span>SIX SEVEN REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+        </div>
+      </div>
+
+      <div class="modal-card">
+        <h2
+          id="titulo-form"
+          style="text-align: center; color: white; margin-bottom: 20px"
+        >
+          INICIAR SESIÓN
+        </h2>
+
+        <form class="custom-form" id="form-login" autocomplete="off">
+          <div class="input-group">
+            <label style="color: #ccc; font-size: 12px"
+              >CORREO INSTITUCIONAL</label
+            >
+            <input
+              type="email"
+              id="loginUserSip"
+              placeholder="Correo SIP"
+              required
+              autocomplete="new-password"
+            />
+          </div>
+
+          <div class="input-group">
+            <label style="color: #ccc; font-size: 12px">CONTRASEÑA</label>
+            <input
+              type="password"
+              id="loginPassSip"
+              placeholder="••••••••"
+              required
+              autocomplete="new-password"
+            />
+          </div>
+
+          <label
+            class="remember-container"
+            style="
+              cursor: pointer;
+              user-select: none;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              margin-bottom: 15px;
+            "
+          >
+            <div class="custom-checkbox">
+              <input
+                type="checkbox"
+                id="recordarme"
+                style="
+                  position: absolute;
+                  opacity: 0;
+                  cursor: pointer;
+                  height: 0;
+                  width: 0;
+                "
+              />
+              <span class="checkmark"></span>
+            </div>
+            <span style="color: white; font-size: 14px">Recordarme</span>
+          </label>
+
+          <button type="button" id="btnLogin" class="submit-btn">
+            INGRESAR
+          </button>
+
+          <p
+            style="
+              text-align: center;
+              margin-top: 15px;
+              color: white;
+              font-size: 14px;
+            "
+          >
+            ¿Eres nuevo?
+            <a
+              href="#"
+              id="ir-a-registro"
+              style="color: #ffbf00; text-decoration: none"
+              >¡Crea tu cuenta aquí!</a
+            >
+          </p>
+        </form>
+
+        <form
+          class="custom-form"
+          id="form-registro"
+          style="display: none"
+          autocomplete="off"
+        >
+          <div class="registro-grid">
+            <div class="input-group">
+              <label style="color: #ccc; font-size: 11px">RUT</label>
+              <input
+                type="text"
+                id="regRut"
+                placeholder="RUT sin Guion ni Puntos."
+                required
+              />
+            </div>
+            <div class="input-group">
+              <label style="color: #ccc; font-size: 11px">CORREO INST.</label>
+              <input
+                type="email"
+                id="regEmailSip"
+                placeholder="@sip.cl"
+                required
+                autocomplete="off"
+              />
+            </div>
+          </div>
+          <div class="registro-grid">
+            <div class="input-group">
+              <label style="color: #ccc; font-size: 11px">CONTRASEÑA</label>
+              <input
+                type="password"
+                id="regPassSip"
+                required
+                autocomplete="new-password"
+                placeholder="••••••••"
+              />
+            </div>
+            <div class="input-group">
+              <label style="color: #ccc; font-size: 11px">CONFIRMAR</label>
+              <input
+                type="password"
+                id="regConfirmPassSip"
+                required
+                autocomplete="new-password"
+                placeholder="••••••••"
+              />
+            </div>
+          </div>
+          <button type="button" id="btnRegister" class="submit-btn">
+            REGISTRARME
+          </button>
+          <p
+            style="
+              text-align: center;
+              margin-top: 15px;
+              color: white;
+              font-size: 14px;
+            "
+          >
+            <a
+              href="#"
+              id="ir-a-login"
+              style="color: #ffbf00; text-decoration: none"
+              >¡Volver al Inicio de Sesión!</a
+            >
+          </p>
+        </form>
+
+        <p
+          id="msg"
+          style="
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+            color: #ff4c4c;
+            min-height: 20px;
+          "
+        ></p>
+      </div>
+    </div>
+
+    <div id="pagina-protegida">
+      <header class="main-header">
+        <div class="container header-content">
+          <div style="display: flex; align-items: center; gap: 18px">
+            <button
+              class="hamburger-btn"
+              id="btnHamburger"
+              aria-label="Abrir menú"
+              aria-expanded="false"
+            >
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+            </button>
+            <div class="logo-area">
+              <h1>REPORTES <span class="text-yellow">SIP</span></h1>
+              <p class="subtitle">
+                Cyber<span class="text-white">Tilines</span>
+              </p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 15px">
+            <a href="cuenta.html" class="cuenta-btn-aesthetic">
+              <img src="acclogo.png" alt="User Profile" class="cuenta-icon" />
+            </a>
+            <button class="login-btn" id="btnCerrarSesion">
+              CERRAR SESIÓN
+            </button>
+          </div>
+        </div>
+        <div class="header-line"></div>
+      </header>
+
+      <main class="container">
+        <section class="hero-section">
+          <div class="image-box">
+            <img src="sipcol1.jpg" alt="Preview" class="img-fluid" />
+          </div>
+
+          <div class="info-column">
+            <div class="info-content">
+              <h3 class="text-yellow">REPORTES SIP - ¿Qué es?</h3>
+
+              <div class="info-item">
+                <h4><span class="text-yellow">01.</span> ¿Para qué sirve?</h4>
+                <p>
+                  Esta plataforma ha sido diseñada para centralizar y agilizar
+                  el levantamiento de incidencias técnicas. Permite a la
+                  comunidad estudiantil informar sobre fallas en laboratorios,
+                  equipos o infraestructura de manera formal y organizada.
+                </p>
+              </div>
+
+              <div class="info-item">
+                <h4><span class="text-yellow">02.</span> Guía de Uso</h4>
+                <p>
+                  El proceso es intuitivo: basta con autenticarse en el sistema,
+                  completar el formulario con los detalles del suceso y adjuntar
+                  una evidencia visual. El equipo técnico recibirá la alerta en
+                  tiempo real para su evaluación.
+                </p>
+              </div>
+
+              <div class="info-item">
+                <h4>
+                  <span class="text-yellow">03.</span> Impacto en la Red SIP
+                </h4>
+                <p>
+                  La importancia radica en mantener la continuidad educativa. Al
+                  reportar activamente, garantizamos que las herramientas
+                  tecnológicas de nuestros liceos estén siempre operativas para
+                  el aprendizaje de excelencia.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div id="report-screen">
+          <div class="modal-card">
+            <a href="#" class="back-arrow" id="cerrarReporte">← VOLVER</a>
+            <h2>NUEVO REPORTE</h2>
+            <form class="custom-form" id="form-reporte">
+              <div class="input-group">
+                <label>ASUNTO DEL REPORTE</label>
+                <input
+                  type="text"
+                  id="reporteTitulo"
+                  placeholder="Ej: Falla en equipo sala 4"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <label>DESCRIPCIÓN DEL REPORTE</label>
+                <textarea
+                  id="reporteDescripcion"
+                  placeholder="Detalle lo ocurrido..."
+                  rows="4"
+                  required
+                ></textarea>
+              </div>
+              <div class="input-group">
+                <label>REPORTE (ADJUNTAR ARCHIVO)</label>
+                <input type="file" class="file-input" id="reporteArchivo" />
+              </div>
+              <div class="anon-check-row">
+                <input type="checkbox" id="reporteAnonimo" />
+                <label for="reporteAnonimo"
+                  >Publicar de forma anónima en la tabla de reportes destacados (el
+                  correo interno siempre incluye tu identidad)</label
+                >
+              </div>
+              <button type="button" class="submit-btn" id="btnEnviarReporte">
+                ENVIAR REPORTE
+              </button>
+              <p id="reporteMsg"></p>
+            </form>
+          </div>
+        </div>
+
+        <section class="action-area">
+          <h2 class="question-text">¿Te gustaria publicar tu reporte?</h2>
+          <a href="#" class="main-button" id="abrirReporte">¡Haz click aquí!</a>
+        </section>
+
+        <section class="leaderboard-section">
+          <h2>Tabla de Reportes Destacados</h2>
+          <p class="subtext">
+            Reportes destacados y subidos recientemente por la comunidad SIP.
+          </p>
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+              <tr>
+                <td colspan="3" class="leaderboard-empty">
+                  Cargando reportes...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </main>
+
+      <div id="mis-reportes-screen">
+        <div class="modal-card" style="max-width: 600px">
+          <a href="#" class="back-arrow" id="cerrarMisReportes">← VOLVER</a>
+          <h2>TUS REPORTES</h2>
+          <div class="mis-reportes-list" id="misReportesLista">
+            <p class="leaderboard-empty">Cargando tus reportes...</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="soporte-screen">
+        <div class="modal-card soporte-modal">
+          <a href="#" class="back-arrow" id="cerrarSoporte">← VOLVER</a>
+          <h2>SOPORTE</h2>
+          <div class="soporte-content">
+            <img
+              class="soporte-avatar"
+              src="REPORTES LOGO.png"
+              alt="Reportes SIP"
+            />
+            <div class="soporte-info">
+              <h3>CYBERTILINES TEAM</h3>
+              <p><strong>Teléfono:</strong> +56 9 7221 5314</p>
+              <p><strong>Correo:</strong> cybertilines@gmail.com</p>
+            </div>
+          </div>
+          <p class="soporte-nota">
+            Cualquier duda o consulta, en caso de no querer contactarnos
+            directamente, puedes ir a inspectoría o hacia convivencia a hacer tu
+            consulta.
+          </p>
+        </div>
+      </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
+        onAuthStateChanged,
+        signOut,
+        setPersistence,
+        browserLocalPersistence,
+        browserSessionPersistence,
+      } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+        getDoc,
+        collection,
+        addDoc,
+        serverTimestamp,
+        query,
+        where,
+        orderBy,
+        limit,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+      import {
+        getStorage,
+        ref,
+        uploadBytes,
+        getDownloadURL,
+      } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
+
+      // ─────────────────────────────────────────────────────────
+      // CONFIGURACIÓN DE EMAILJS (reemplaza estos 3 valores por los tuyos,
+      // se obtienen gratis en https://www.emailjs.com/)
+      // ─────────────────────────────────────────────────────────
+      const EMAILJS_PUBLIC_KEY = "Fdr9w_UZ6HPs_dxC0";
+      const EMAILJS_SERVICE_ID = "service_u15cewk";
+      const EMAILJS_TEMPLATE_ID = "template_xbxkyjk";
+      if (window.emailjs) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCybJ3x7mCXGoX_QvX-lww8DNsxCMl_jrc",
+        authDomain: "proyectopaginacybertilines.firebaseapp.com",
+        projectId: "proyectopaginacybertilines",
+        storageBucket: "proyectopaginacybertilines.firebasestorage.app",
+        messagingSenderId: "515231457085",
+        appId: "1:515231457085:web:82cfc9620965f170036f54",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      const storage = getStorage(app);
+
+      const msg = document.getElementById("msg");
+      const guardLoadingScreen = document.getElementById(
+        "guard-loading-screen",
+      );
+
+      function extraerNombreDesdeCorreo(correo) {
+        if (!correo) return "Usuario CyberTilines";
+        const parteUsuario = correo.split("@")[0];
+        const fragmentos = parteUsuario.split(".");
+
+        const nombreRaw = fragmentos[0] || "";
+        const apellidoRaw = fragmentos[1] || "";
+
+        const nombreFormateado =
+          nombreRaw.charAt(0).toUpperCase() + nombreRaw.slice(1);
+        const apellidoFormateado =
+          apellidoRaw.charAt(0).toUpperCase() + apellidoRaw.slice(1);
+
+        return `${nombreFormateado} ${apellidoFormateado}`.trim();
+      }
+
+      function validarRut(rut) {
+        const rutLimpio = rut
+          .replace(/\./g, "")
+          .replace(/-/g, "")
+          .toUpperCase();
+        if (rutLimpio.length < 8) return false;
+        const cuerpo = rutLimpio.slice(0, -1);
+        const dv = rutLimpio.slice(-1);
+        let suma = 0,
+          multiplo = 2;
+        for (let i = cuerpo.length - 1; i >= 0; i--) {
+          suma += multiplo * cuerpo.charAt(i);
+          multiplo = multiplo < 7 ? multiplo + 1 : 2;
+        }
+        const dvEsperado = 11 - (suma % 11);
+        let dvFinal =
+          dvEsperado === 11
+            ? "0"
+            : dvEsperado === 10
+              ? "K"
+              : dvEsperado.toString();
+        return dv === dvFinal;
+      }
+
+      document.getElementById("ir-a-registro").onclick = (e) => {
+        e.preventDefault();
+        document.getElementById("form-login").style.display = "none";
+        document.querySelector("#pantalla-login #form-registro").style.display =
+          "flex";
+        document.getElementById("titulo-form").innerText = "CREAR CUENTA";
+        msg.innerText = "";
+      };
+
+      document.getElementById("ir-a-login").onclick = (e) => {
+        e.preventDefault();
+        document.querySelector("#pantalla-login #form-registro").style.display =
+          "none";
+        document.getElementById("form-login").style.display = "flex";
+        document.getElementById("titulo-form").innerText = "INICIAR SESIÓN";
+        msg.innerText = "";
+      };
+
+      document.getElementById("btnRegister").onclick = () => {
+        const contenedor = document.getElementById("pantalla-login");
+        const rut = contenedor.querySelector("#regRut").value.trim();
+        const email = contenedor
+          .querySelector("#regEmailSip")
+          .value.toLowerCase()
+          .trim();
+        const pass = contenedor.querySelector("#regPassSip").value;
+        const confirm = contenedor.querySelector("#regConfirmPassSip").value;
+
+        if (!validarRut(rut)) {
+          msg.innerText = "Error: El RUT es inválido.";
+          return;
+        }
+
+        const esValido =
+          email.endsWith("@alumnos.sip.cl") || email.endsWith("@sip.cl");
+        if (!esValido) {
+          msg.innerText = "Usa correo @alumnos.sip.cl o @sip.cl";
+          return;
+        }
+
+        if (pass !== confirm) {
+          msg.innerText = "Las contraseñas no coinciden.";
+          return;
+        }
+        if (pass.length < 6) {
+          msg.innerText = "La contraseña debe de tener un mínimo 6 caracteres.";
+          return;
+        }
+
+        if (guardLoadingScreen) {
+          guardLoadingScreen.style.display = "flex";
+          guardLoadingScreen.style.opacity = "1";
+          guardLoadingScreen.style.visibility = "visible";
+        }
+
+        createUserWithEmailAndPassword(auth, email, pass)
+          .then(async (userCredential) => {
+            const user = userCredential.user;
+            const nombreAsignado = extraerNombreDesdeCorreo(email);
+
+            await setDoc(doc(db, "usuarios", user.uid), {
+              nombreReal: nombreAsignado,
+              correo: email,
+              rut: rut,
+              username: "",
+              bio: "",
+              creadoEn: new Date(),
+            });
+
+            alert(
+              `¡Cuenta creada con éxito! Bienvenido/a ${nombreAsignado}. Ahora inicia sesión manualmente.`,
+            );
+            await signOut(auth);
+            location.reload();
+          })
+          .catch((err) => {
+            if (guardLoadingScreen) {
+              guardLoadingScreen.style.opacity = "0";
+              guardLoadingScreen.style.visibility = "hidden";
+            }
+            if (err.code === "auth/email-already-in-use")
+              msg.innerText = "El correo ya existe.";
+            else msg.innerText = "Error: " + err.message;
+          });
+      };
+
+      document.getElementById("btnLogin").onclick = () => {
+        const email = document.getElementById("loginUserSip").value.trim();
+        const pass = document.getElementById("loginPassSip").value;
+        const recordar = document.getElementById("recordarme").checked;
+
+        if (!email || !pass) return;
+
+        if (guardLoadingScreen) {
+          guardLoadingScreen.style.display = "flex";
+          guardLoadingScreen.style.opacity = "1";
+          guardLoadingScreen.style.visibility = "visible";
+        }
+
+        const persistencia = recordar
+          ? browserLocalPersistence
+          : browserSessionPersistence;
+
+        setPersistence(auth, persistencia)
+          .then(() => {
+            return signInWithEmailAndPassword(auth, email, pass);
+          })
+          .catch((err) => {
+            if (guardLoadingScreen) {
+              guardLoadingScreen.style.opacity = "0";
+              guardLoadingScreen.style.visibility = "hidden";
+            }
+            msg.innerText = "Correo o contraseña incorrectos.";
+          });
+      };
+
+      document.getElementById("btnCerrarSesion").onclick = () => {
+        if (guardLoadingScreen) {
+          guardLoadingScreen.style.display = "flex";
+          guardLoadingScreen.style.opacity = "1";
+          guardLoadingScreen.style.visibility = "visible";
+        }
+        signOut(auth).then(() => {
+          location.reload();
+        });
+      };
+
+      onAuthStateChanged(auth, (user) => {
+        const loginScreen = document.getElementById("pantalla-login");
+        const mainContent = document.getElementById("pagina-protegida");
+
+        if (user) {
+          loginScreen.style.display = "none";
+          mainContent.style.display = "block";
+        } else {
+          loginScreen.style.display = "flex";
+          mainContent.style.display = "none";
+
+          const inputUser = document.getElementById("loginUserSip");
+          const inputPass = document.getElementById("loginPassSip");
+          if (inputUser) inputUser.value = "";
+          if (inputPass) inputPass.value = "";
+
+          document.getElementById("form-login").style.display = "flex";
+          const formReg = document.querySelector(
+            "#pantalla-login #form-registro",
+          );
+          if (formReg) formReg.style.display = "none";
+          document.getElementById("titulo-form").innerText = "INICIAR SESIÓN";
+        }
+
+        if (guardLoadingScreen) {
+          guardLoadingScreen.style.opacity = "0";
+          guardLoadingScreen.style.visibility = "hidden";
+          setTimeout(() => {
+            guardLoadingScreen.style.display = "none";
+          }, 400);
+        }
+
+        cargarLeaderboard();
+      });
+
+      const reportScreen = document.getElementById("report-screen");
+      const misReportesScreen = document.getElementById("mis-reportes-screen");
+
+      document.getElementById("abrirReporte").addEventListener("click", (e) => {
+        e.preventDefault();
+        reportScreen.classList.add("is-open");
+      });
+      document
+        .getElementById("cerrarReporte")
+        .addEventListener("click", (e) => {
+          e.preventDefault();
+          reportScreen.classList.remove("is-open");
+        });
+
+      document
+        .getElementById("abrirMisReportes")
+        .addEventListener("click", (e) => {
+          e.preventDefault();
+          closeMenuIfExists();
+          misReportesScreen.classList.add("is-open");
+          cargarMisReportes();
+        });
+      document
+        .getElementById("cerrarMisReportes")
+        .addEventListener("click", (e) => {
+          e.preventDefault();
+          misReportesScreen.classList.remove("is-open");
+        });
+
+      const soporteScreen = document.getElementById("soporte-screen");
+      document.getElementById("abrirSoporte").addEventListener("click", (e) => {
+        e.preventDefault();
+        closeMenuIfExists();
+        soporteScreen.classList.add("is-open");
+      });
+      document
+        .getElementById("cerrarSoporte")
+        .addEventListener("click", (e) => {
+          e.preventDefault();
+          soporteScreen.classList.remove("is-open");
+        });
+      function closeMenuIfExists() {
+        const navPanel = document.getElementById("navPanel");
+        const navOverlay = document.getElementById("navOverlay");
+        if (navPanel) navPanel.classList.remove("is-open");
+        if (navOverlay) navOverlay.classList.remove("is-open");
+        document.body.style.overflow = "";
+      }
+
+      const reporteMsg = document.getElementById("reporteMsg");
+
+      function setReporteMsg(texto, tipo) {
+        reporteMsg.innerText = texto;
+        reporteMsg.className = tipo || "";
+      }
+
+      document
+        .getElementById("btnEnviarReporte")
+        .addEventListener("click", async () => {
+          const user = auth.currentUser;
+          if (!user) {
+            setReporteMsg("Debes iniciar sesión.", "err");
+            return;
+          }
+
+          const titulo = document.getElementById("reporteTitulo").value.trim();
+          const descripcion = document
+            .getElementById("reporteDescripcion")
+            .value.trim();
+          const archivoInput = document.getElementById("reporteArchivo");
+          const archivo = archivoInput.files[0] || null;
+          const anonimo = document.getElementById("reporteAnonimo").checked;
+
+          if (!titulo || !descripcion) {
+            setReporteMsg("Completa el título y la descripción.", "err");
+            return;
+          }
+
+          const btn = document.getElementById("btnEnviarReporte");
+          btn.disabled = true;
+          setReporteMsg("Enviando reporte...", "");
+
+          try {
+            const perfilSnap = await getDoc(doc(db, "usuarios", user.uid));
+            const nombreReal = perfilSnap.exists()
+              ? perfilSnap.data().nombreReal || user.email
+              : user.email;
+            const fotoPerfilUrl = perfilSnap.exists()
+              ? perfilSnap.data().fotoPerfilUrl || null
+              : null;
+            const usernameElegido = perfilSnap.exists()
+              ? perfilSnap.data().username || null
+              : null;
+
+            let archivoURL = null;
+            let archivoNombre = null;
+            if (archivo) {
+              archivoNombre = archivo.name;
+              const rutaArchivo = ref(
+                storage,
+                `reportes/${user.uid}/${Date.now()}_${archivo.name}`,
+              );
+              await uploadBytes(rutaArchivo, archivo);
+              archivoURL = await getDownloadURL(rutaArchivo);
+            }
+
+            const nuevoReporte = {
+              titulo,
+              descripcion,
+              archivoURL,
+              archivoNombre,
+              autorUID: user.uid,
+              autorNombre: nombreReal,
+              autorUsername: usernameElegido,
+              autorFotoUrl: fotoPerfilUrl,
+              autorCorreo: user.email,
+              anonimo,
+              destacado: false,
+              fecha: serverTimestamp(),
+            };
+            await addDoc(collection(db, "reportes"), nuevoReporte);
+
+            if (window.emailjs && EMAILJS_PUBLIC_KEY !== "TU_PUBLIC_KEY") {
+              await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                titulo,
+                descripcion,
+                nombre_remitente: nombreReal,
+                correo_remitente: user.email,
+                archivo_url: archivoURL || "Sin archivo adjunto",
+                fecha: new Date().toLocaleString("es-CL"),
+              });
+            }
+
+            setReporteMsg("¡Reporte enviado con éxito!", "ok");
+            document.getElementById("form-reporte").reset();
+            cargarLeaderboard();
+
+            setTimeout(() => {
+              reportScreen.classList.remove("is-open");
+              setReporteMsg("", "");
+            }, 1200);
+          } catch (err) {
+            console.error(err);
+            setReporteMsg("Error al enviar el reporte: " + err.message, "err");
+          } finally {
+            btn.disabled = false;
+          }
+        });
+
+      async function cargarLeaderboard() {
+        const tbody = document.getElementById("leaderboardBody");
+        if (!tbody) return;
+        try {
+          const q = query(
+            collection(db, "reportes"),
+            orderBy("fecha", "desc"),
+            limit(10),
+          );
+          const snap = await getDocs(q);
+
+          if (snap.empty) {
+            tbody.innerHTML =
+              '<tr><td colspan="3" class="leaderboard-empty">Aún no hay reportes publicados.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = "";
+          snap.forEach((docSnap) => {
+            const r = docSnap.data();
+            const nombreMostrado = r.anonimo
+              ? '<span class="badge-anonimo">Anónimo</span>'
+              : escapeHTML(r.autorNombre || "Usuario") +
+                (r.autorUsername
+                  ? ` <span class="autor-username">(${escapeHTML(r.autorUsername)})</span>`
+                  : "");
+            const avatarHTML =
+              !r.anonimo && r.autorFotoUrl
+                ? `<img class="autor-avatar" src="${r.autorFotoUrl}" alt="">`
+                : `<span class="autor-avatar-placeholder"><svg viewBox="0 0 24 24" fill="currentColor" style="color:#fff"><path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.5c-3.3 0-9.8 1.6-9.8 4.9v2.4h19.6v-2.4c0-3.3-6.5-4.9-9.8-4.9z"/></svg></span>`;
+            const destacadoBadge = r.destacado
+              ? '<span class="badge-destacado">★ Destacado</span>'
+              : "";
+            const fechaTexto =
+              r.fecha && r.fecha.toDate
+                ? r.fecha.toDate().toLocaleDateString("es-CL")
+                : "—";
+
+            const fila = document.createElement("tr");
+            fila.innerHTML = `
+                    <td>${escapeHTML(r.titulo)} ${destacadoBadge}</td>
+                    <td><span class="autor-cell">${avatarHTML}${nombreMostrado}</span></td>
+                    <td>${fechaTexto}</td>
+                `;
+            tbody.appendChild(fila);
+          });
+        } catch (err) {
+          console.error(err);
+          tbody.innerHTML =
+            '<tr><td colspan="3" class="leaderboard-empty">No se pudo cargar la tabla de clasificación.</td></tr>';
+        }
+      }
+
+      async function cargarMisReportes() {
+        const contenedor = document.getElementById("misReportesLista");
+        const user = auth.currentUser;
+        if (!user) return;
+
+        contenedor.innerHTML =
+          '<p class="leaderboard-empty">Cargando tus reportes...</p>';
+        try {
+          const q = query(
+            collection(db, "reportes"),
+            where("autorUID", "==", user.uid),
+            orderBy("fecha", "desc"),
+          );
+          const snap = await getDocs(q);
+
+          if (snap.empty) {
+            contenedor.innerHTML =
+              '<p class="leaderboard-empty">Todavía no has enviado ningún reporte.</p>';
+            return;
+          }
+
+          contenedor.innerHTML = "";
+          snap.forEach((docSnap) => {
+            const r = docSnap.data();
+            const fechaTexto =
+              r.fecha && r.fecha.toDate
+                ? r.fecha.toDate().toLocaleString("es-CL")
+                : "—";
+            const archivoHTML = r.archivoURL
+              ? `<a class="archivo-link" href="${r.archivoURL}" target="_blank" rel="noopener">Ver archivo adjunto</a>`
+              : "";
+            const anonimoTexto = r.anonimo
+              ? '<span class="badge-anonimo">Publicado como anónimo</span>'
+              : "";
+
+            const card = document.createElement("div");
+            card.className = "mi-reporte-card";
+            card.innerHTML = `
+                    <h4>${escapeHTML(r.titulo)}</h4>
+                    <p>${escapeHTML(r.descripcion)}</p>
+                    <div class="meta">${fechaTexto} ${anonimoTexto}</div>
+                    ${archivoHTML}
+                `;
+            contenedor.appendChild(card);
+          });
+        } catch (err) {
+          console.error(err);
+          contenedor.innerHTML =
+            '<p class="leaderboard-empty">No se pudieron cargar tus reportes.</p>';
+        }
+      }
+
+      function escapeHTML(str) {
+        if (!str) return "";
+        const div = document.createElement("div");
+        div.innerText = str;
+        return div.innerHTML;
+      }
+    </script>
+    <script>
+      const btnHamburger = document.getElementById("btnHamburger");
+      const navPanel = document.getElementById("navPanel");
+      const navOverlay = document.getElementById("navOverlay");
+      function openMenu() {
+        navPanel.classList.add("is-open");
+        navOverlay.classList.add("is-open");
+        btnHamburger.classList.add("is-open");
+        btnHamburger.setAttribute("aria-expanded", "true");
+        document.body.style.overflow = "hidden";
+      }
+      function closeMenu() {
+        navPanel.classList.remove("is-open");
+        navOverlay.classList.remove("is-open");
+        btnHamburger.classList.remove("is-open");
+        btnHamburger.setAttribute("aria-expanded", "false");
+        document.body.style.overflow = "";
+      }
+      btnHamburger.addEventListener("click", () =>
+        navPanel.classList.contains("is-open") ? closeMenu() : openMenu(),
+      );
+      navOverlay.addEventListener("click", closeMenu);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeMenu();
+      });
+    </script>
+  </body>
+</html>
