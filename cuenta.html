@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CONFIGURACIÓN DE CUENTA - CyberTilines</title>
+    
+    <!-- Hojas de estilo generales y específicas de la cuenta -->
+    <link rel="stylesheet" href="paginaProyecto_CYBERTILINES.css" />
+    <link rel="stylesheet" href="cuenta_estilos.css" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="icon" href="Imagen/REPORTES LOGO.png" type="image/png" />
+    
+    <!-- Lógica de navegación, pestañas y RUT -->
+    <script src="auth.js" defer></script>
+</head>
+<body>
+
+    <!-- Texto Marquee de fondo animado -->
+    <div id="texto-marquesina-fondo" class="caja-texto-fondo-cuenta" aria-hidden="true"></div>
+
+    <!-- Pantalla de carga/sincronización -->
+    <div id="guard-loading-screen">
+        <div class="titulocargando">SISTEMA // VERIFICANDO CREDENCIALES...</div>
+        <div class="contenedorbarra">
+            <div class="progresobarra"></div>
+        </div>
+        <div class="estadocargando">Sincronizando datos: OK!</div>
+    </div>
+
+    <!-- Cabecera principal -->
+    <header class="cabeceraprincipal">
+        <div class="contenedor contenidocabecera">
+            <div style="display: flex; align-items: center; gap: 18px;">
+                <a href="index.html" class="flechaparatras" style="margin: 0; text-decoration: none; font-weight: bold; color: var(--gold);">← INICIO</a>
+                <div class="areadellogo">
+                    <h1>CONFIGURACIÓN DE <span class="textoamarillo">CUENTA</span></h1>
+                    <p class="subtituloxd">Cyber<span class="textoblanco">Tilines</span></p>
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button id="themeBtn" class="botoncerrarsesion">CAMBIAR ASPECTO</button>
+                <button class="botoncerrarsesion" id="btnCerrarSesionCuenta">CERRAR SESIÓN</button>
+            </div>
+        </div>
+        <div class="lineacabecera"></div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="contenedor-cuenta">
+        
+        <!-- Pestañas de Navegación -->
+        <nav class="tabs-navegacion">
+            <button class="tab-btn activo" id="tab-cuenta">
+                PERFIL <span class="cursorparpadea">_</span>
+            </button>
+            <button class="tab-btn" id="tab-seguridad">
+                SEGURIDAD <span class="cursorparpadea" style="display: none;">_</span>
+            </button>
+        </nav>
+
+        <!-- SECCIÓN 1: PERFIL DE USUARIO -->
+        <section id="seccion-perfil" class="seccion-tab activo">
+            <div class="tarjeta-perfil">
+                <h2 style="color: var(--gold); margin-top: 0;">INFORMACIÓN PERSONAL</h2>
+                <form class="formulariocustom" id="form-actualizar-perfil">
+                    <div class="grilla-perfil">
+                        <div class="grupodeinputs">
+                            <label>NOMBRE COMPLETO</label>
+                            <input type="text" id="accNombre" placeholder="Cargando..." readonly style="opacity: 0.7; cursor: not-allowed;" />
+                        </div>
+                        
+                        <div class="grupodeinputs">
+                            <label>RUT REGISTRADO</label>
+                            <input type="text" id="accRut" placeholder="Cargando..." readonly style="opacity: 0.7; cursor: not-allowed;" />
+                        </div>
+
+                        <div class="grupodeinputs">
+                            <label>CORREO INSTITUCIONAL</label>
+                            <input type="email" id="accCorreo" placeholder="Cargando..." readonly style="opacity: 0.7; cursor: not-allowed;" />
+                        </div>
+
+                        <div class="grupodeinputs">
+                            <label>NOMBRE DE USUARIO (APODO)</label>
+                            <input type="text" id="accUsername" placeholder="Ej: CyberUser99" />
+                        </div>
+                    </div>
+
+                    <div class="grupodeinputs" style="margin-top: 15px;">
+                        <label>BIOGRAFÍA / PRESENTACIÓN</label>
+                        <textarea id="accBio" rows="3" placeholder="Escribe algo sobre ti..."></textarea>
+                    </div>
+
+                    <button type="button" class="botonpaenviar" id="btnGuardarPerfil" style="width: auto; padding: 12px 30px; align-self: flex-start;">
+                        GUARDAR CAMBIOS
+                    </button>
+                    <p id="accMsgPerfil" style="margin-top: 10px;"></p>
+                </form>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: SEGURIDAD -->
+        <section id="seccion-seguridad" class="seccion-tab">
+            <div class="tarjeta-perfil">
+                <h2 style="color: var(--gold); margin-top: 0;">CAMBIAR CONTRASEÑA</h2>
+                <form class="formulariocustom" id="form-cambiar-pass">
+                    <div class="grupodeinputs">
+                        <label>CONTRASEÑA ACTUAL</label>
+                        <input type="password" id="passActual" placeholder="••••••••" required />
+                    </div>
+
+                    <div class="grilla-perfil" style="margin-top: 10px;">
+                        <div class="grupodeinputs">
+                            <label>NUEVA CONTRASEÑA</label>
+                            <input type="password" id="passNueva" placeholder="••••••••" required />
+                        </div>
+                        <div class="grupodeinputs">
+                            <label>CONFIRMAR NUEVA CONTRASEÑA</label>
+                            <input type="password" id="passConfirmar" placeholder="••••••••" required />
+                        </div>
+                    </div>
+
+                    <button type="button" class="botonpaenviar" id="btnCambiarPass" style="width: auto; padding: 12px 30px; align-self: flex-start; margin-top: 15px;">
+                        ACTUALIZAR CONTRASEÑA
+                    </button>
+                    <p id="accMsgSeguridad" style="margin-top: 10px;"></p>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Conexión a Firebase para datos de la cuenta -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+      import { 
+        getAuth, 
+        onAuthStateChanged, 
+        signOut,
+        updatePassword,
+        EmailAuthProvider,
+        reauthenticateWithCredential
+      } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+      import { 
+        getFirestore, 
+        doc, 
+        getDoc, 
+        updateDoc 
+      } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCybJ3x7mCXGoX_QvX-lww8DNsxCMl_jrc",
+        authDomain: "proyectopaginacybertilines.firebaseapp.com",
+        projectId: "proyectopaginacybertilines",
+        storageBucket: "proyectopaginacybertilines.firebasestorage.app",
+        messagingSenderId: "515231457085",
+        appId: "1:515231457085:web:82cfc9620965f170036f54"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      const guardLoadingScreen = document.getElementById("guard-loading-screen");
+
+      // Cargar datos del perfil
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        try {
+          const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            document.getElementById("accNombre").value = data.nombreReal || "No registrado";
+            document.getElementById("accRut").value = data.rut || "No registrado";
+            document.getElementById("accCorreo").value = data.correo || user.email;
+            document.getElementById("accUsername").value = data.username || "";
+            document.getElementById("accBio").value = data.bio || "";
+          }
+        } catch (err) {
+          console.error("Error al obtener perfil:", err);
+        } finally {
+          if (guardLoadingScreen) {
+            guardLoadingScreen.style.opacity = "0";
+            guardLoadingScreen.style.visibility = "hidden";
+            setTimeout(() => { guardLoadingScreen.style.display = "none"; }, 400);
+          }
+        }
+      });
+
+      // Guardar cambios en el perfil (Username y Bio)
+      document.getElementById("btnGuardarPerfil").addEventListener("click", async () => {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const username = document.getElementById("accUsername").value.trim();
+        const bio = document.getElementById("accBio").value.trim();
+        const msg = document.getElementById("accMsgPerfil");
+
+        msg.style.color = "#ffcc00";
+        msg.innerText = "Guardando...";
+
+        try {
+          await updateDoc(doc(db, "usuarios", user.uid), {
+            username: username,
+            bio: bio
+          });
+          msg.style.color = "#4caf50";
+          msg.innerText = "¡Perfil actualizado con éxito!";
+        } catch (err) {
+          msg.style.color = "#f44336";
+          msg.innerText = "Error al actualizar: " + err.message;
+        }
+      });
+
+      // Cerrar sesión
+      document.getElementById("btnCerrarSesionCuenta").addEventListener("click", () => {
+        signOut(auth).then(() => {
+          window.location.href = "index.html";
+        });
+      });
+    </script>
+</body>
+</html>

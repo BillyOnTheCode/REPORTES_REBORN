@@ -1,0 +1,110 @@
+/* ==========================================
+   CORRECCIONES DE ESTRUCTURA Y LAYOUT
+   ========================================== */
+
+/* 1. Fondo de marquesina corregido (para que no tape nada) */
+.caja-texto-fondo-cuenta {
+    position: fixed;
+    top: -50px;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1; /* Va detrás de TODO el contenido */
+    overflow: hidden;
+    opacity: 0.03; /* Muy suave para no interferir */
+    pointer-events: none;
+    user-select: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    line-height: 1.2;
+    white-space: wrap;
+    color: var(--white, #ffffff);
+}
+
+/* 2. Contenedor Principal Centrado */
+.contenedor-cuenta {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+}
+
+/* 3. Navegación por Pestañas */
+.tabs-navegacion {
+    display: flex;
+    gap: 10px;
+    border-bottom: 2px solid var(--border-color, rgba(255, 204, 0, 0.2));
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: #888888;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 10px 18px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.tab-btn.activo {
+    color: var(--gold, #ffcc00);
+}
+
+.tab-btn.activo::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--gold, #ffcc00);
+}
+
+/* 4. Transiciones de Secciones */
+.seccion-tab {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.seccion-tab.activo {
+    display: block;
+    opacity: 1;
+}
+
+/* 5. Tarjetas de Perfil y Formularios */
+.tarjeta-perfil {
+    background: #161b22;
+    border: 1px solid var(--border-color, rgba(255, 204, 0, 0.2));
+    border-radius: 8px;
+    padding: 24px;
+}
+
+.grilla-perfil {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+/* 6. CONTROL DE IMÁGENES GIANTES (Arregla la tabla y perfil en la Home) */
+.tabladelideres img,
+.areadellogo img,
+header img {
+    max-width: 100px; /* Evita que los avatares o logos crezcan sin control */
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.tabladelideres td img {
+    max-width: 180px; /* Tamaño máximo para las imágenes dentro de publicaciones */
+    max-height: 180px;
+    border-radius: 6px;
+    object-fit: cover;
+}

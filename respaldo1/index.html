@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>REPORTES SIP - CyberTilines</title>
+    <link rel="stylesheet" href="index.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
+    <link rel="icon" href="Imagen/REPORTES LOGO.png" type="image/png">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  </head>
+  <body>
+    <span class="capaoscurapatapar" id="navOverlay"></span>
+
+    <nav class="paneldenavegacion" id="navPanel" aria-label="Menú principal">
+      <header class="cabeceradelmenu">
+        <span class="barritadearriba"></span>
+        <span>// NAVEGACIÓN</span>
+        <h2 class="titulodelmenu">
+          CYBER<span class="doradito">TILINES</span>
+        </h2>
+      </header>
+      <ul class="listadelmenu">
+        <li>
+          <a href="cuenta.html" class="enlacemenuxd">
+            Cuenta<span class="flechitamenu">›</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="enlacemenuxd" id="abrirMisReportes">
+            Tus Reportes<span class="flechitamenu">›</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="enlacemenuxd" id="abrirSoporte">
+            Soporte<span class="flechitamenu">›</span>
+          </a>
+        </li>
+      </ul>
+      <svg class="decoraciondelesquina" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 60 30 L 30 60" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+        <path d="M 15 60 L 34 41" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+        <path d="M 46 29 L 60 15" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+      </svg>
+      <footer class="nav-panel-footer">
+        <p class="textodelamarca">CyberTilines® — Reportes SIP©</p>
+      </footer>
+    </nav>
+
+    <section id="guard-loading-screen" class="pantallacargando">
+      <h2 class="titulocargando">
+        SISTEMA // VERIFICANDO CREDENCIALES...
+      </h2>
+      <figure class="contenedorbarra">
+        <span class="progresobarra"></span>
+      </figure>
+      <p class="estadocargando">
+        Sincronizando datos: OK!
+      </p>
+    </section>
+
+    <!-- Fondo e Interfaz de Login -->
+    <section id="pantalla-login" class="pantallacompletalogin">
+      <figure class="cajatextofondo">
+        <span class="textoquemueve">
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+        </span>
+      </figure>
+
+      <article class="tarjetitamodal">
+        <h2 id="titulo-form" style="text-align: center; color: white; margin-bottom: 20px">
+          INICIAR SESIÓN
+        </h2>
+
+        <form class="formulariocustom" id="form-login" autocomplete="off">
+          <p class="grupodeinputs">
+            <label style="color: #ccc; font-size: 12px">CORREO INSTITUCIONAL</label>
+            <input type="email" id="loginUserSip" placeholder="Correo SIP" required autocomplete="new-password"/>
+          </p>
+
+          <p class="grupodeinputs">
+            <label style="color: #ccc; font-size: 12px">CONTRASEÑA</label>
+            <input type="password" id="loginPassSip" placeholder="••••••••" required autocomplete="new-password"/>
+          </p>
+
+          <label class="contenedorrecordar" style="cursor: pointer; user-select: none; display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+            <span class="checkboxcustom">
+              <input type="checkbox" id="recordarme" style="position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0;"/>
+              <span class="palomitaxd"></span>
+            </span>
+            <span style="color: white; font-size: 14px">Recordarme</span>
+          </label>
+
+          <button type="button" id="btnLogin" class="botonpaenviar">
+            INGRESAR
+          </button>
+
+          <p style="text-align: center; margin-top: 15px; color: white; font-size: 14px;">
+            ¿Eres nuevo?
+            <a href="#" id="ir-a-registro" style="color: #ffbf00; text-decoration: none">¡Crea tu cuenta aquí!</a>
+          </p>
+        </form>
+
+        <form class="formulariocustom" id="form-registro" style="display: none" autocomplete="off">
+          <section class="grilladeregistro">
+            <p class="grupodeinputs">
+              <label style="color: #ccc; font-size: 11px">RUT</label>
+              <input type="text" id="regRut" placeholder="RUT sin Guion ni Puntos." required/>
+            </p>
+            <p class="grupodeinputs">
+              <label style="color: #ccc; font-size: 11px">CORREO INST.</label>
+              <input type="email" id="regEmailSip" placeholder="@sip.cl" required autocomplete="off"/>
+            </p>
+          </section>
+          <section class="grilladeregistro">
+            <p class="grupodeinputs">
+              <label style="color: #ccc; font-size: 11px">CONTRASEÑA</label>
+              <input type="password" id="regPassSip" required autocomplete="new-password" placeholder="••••••••"/>
+            </p>
+            <p class="grupodeinputs">
+              <label style="color: #ccc; font-size: 11px">CONFIRMAR</label>
+              <input type="password" id="regConfirmPassSip" required autocomplete="new-password" placeholder="••••••••"/>
+            </p>
+          </section>
+          <button type="button" id="btnRegister" class="botonpaenviar">
+            REGISTRARME
+          </button>
+          <p style="text-align: center; margin-top: 15px; color: white; font-size: 14px;">
+            <a href="#" id="ir-a-login" style="color: #ffbf00; text-decoration: none">¡Volver al Inicio de Sesión!</a>
+          </p>
+        </form>
+
+        <p id="msg" style="margin-top: 15px; font-weight: bold; text-align: center; color: #ff4c4c; min-height: 20px;"></p>
+      </article>
+    </section>
+
+    <!-- Área Privada -->
+    <section id="pagina-protegida" style="display: none;">
+      <header class="cabeceraprincipal">
+        <nav class="contenedor contenidocabecera">
+          <aside style="display: flex; align-items: center; gap: 18px">
+            <button class="botonhamburguesa" id="btnHamburger" aria-label="Abrir menú" aria-expanded="false">
+              <span class="barritahamburguesa"></span>
+              <span class="barritahamburguesa"></span>
+              <span class="barritahamburguesa"></span>
+            </button>
+            <header class="areadellogo">
+              <h1>REPORTES <span class="textoamarillo">SIP</span></h1>
+              <p class="subtituloxd">
+                Cyber<span class="textoblanco">Tilines</span>
+              </p>
+            </header>
+          </aside>
+          <nav style="display: flex; align-items: center; gap: 15px">
+            <button id="themeBtn" class="botoncerrarsesion">Cambiar Aspecto</button>
+            <a href="cuenta.html" class="botoncuentaaesthetic">
+              <img src="Imagen/REPORTES LOGO.png" alt="User Profile" class="iconocuenta" />
+            </a>
+            <button class="botoncerrarsesion" id="btnCerrarSesion">
+              CERRAR SESIÓN
+            </button>
+          </nav>
+        </nav>
+        <span class="lineacabecera"></span>
+      </header>
+
+      <main class="contenedor">
+        <section class="seccionhero">
+          <figure class="cajadeimagen">
+            <img src="Imagen/REPORTES LOGO.png" alt="Preview" class="imagenpapuchadxdd" />
+          </figure>
+
+          <article class="columnadeinfo">
+            <section class="contenidodeinfo">
+              <h3 class="textoamarillo">REPORTES SIP - ¿Qué es?</h3>
+
+              <article class="itemdeinfo">
+                <h4><span class="textoamarillo">01.</span> ¿Para qué sirve?</h4>
+                <p>
+                  Esta plataforma ha sido diseñada para centralizar y agilizar
+                  el levantamiento de incidencias técnicas. Permite a la
+                  comunidad estudiantil informar sobre fallas en laboratorios,
+                  equipos o infraestructura de manera formal y organizada.
+                </p>
+              </article>
+
+              <article class="itemdeinfo">
+                <h4><span class="textoamarillo">02.</span> Guía de Uso</h4>
+                <p>
+                  El proceso es intuitivo: basta con autenticarse en el sistema,
+                  completar el formulario con los detalles del suceso y adjuntar
+                  una evidencia visual. El equipo técnico recibirá la alerta en
+                  tiempo real para su evaluación.
+                </p>
+              </article>
+
+              <article class="itemdeinfo">
+                <h4><span class="textoamarillo">03.</span> Impacto en la Red SIP</h4>
+                <p>
+                  La importancia radica en mantener la continuidad educativa. Al
+                  reportar activamente, garantizamos que las herramientas
+                  tecnológicas de nuestros liceos estén siempre operativas para
+                  el aprendizaje de excelencia.
+                </p>
+              </article>
+            </section>
+          </article>
+        </section>
+
+        <section id="report-screen">
+          <article class="tarjetitamodal">
+            <a href="#" class="flechaparatras" id="cerrarReporte">← VOLVER</a>
+            <h2>NUEVO REPORTE</h2>
+            <form class="formulariocustom" id="form-reporte">
+              <p class="grupodeinputs">
+                <label for="reporteTitulo">ASUNTO DEL REPORTE</label>
+                <input type="text" id="reporteTitulo" placeholder="Ej: Falla en equipo sala 4" required/>
+              </p>
+              <p class="grupodeinputs">
+                <label for="reporteDescripcion">DESCRIPCIÓN DEL REPORTE</label>
+                <textarea id="reporteDescripcion" placeholder="Detalle lo ocurrido..." rows="4" required></textarea>
+              </p>
+              <p class="grupodeinputs">
+                <label for="reporteArchivo">REPORTE (ADJUNTAR ARCHIVO)</label>
+                <input type="file" class="inputdearchivo" id="reporteArchivo" />
+              </p>
+              <p class="filacheckanonimo">
+                <input type="checkbox" id="reporteAnonimo" />
+                <label for="reporteAnonimo">Publicar de forma anónima en la tabla de reportes destacados</label>
+              </p>
+              <button type="button" class="botonpaenviar" id="btnEnviarReporte">
+                ENVIAR REPORTE
+              </button>
+              <p id="reporteMsg"></p>
+            </form>
+          </article>
+        </section>
+
+        <section class="areadeaccion">
+          <h2 class="textodepregunta">¿Te gustaria publicar tu reporte?</h2>
+          <a href="#" class="botonprincipal" id="abrirReporte">¡Haz click aquí!</a>
+        </section>
+
+        <section class="seccionlideres">
+          <h2>Tabla de Reportes Destacados</h2>
+          <p class="subtextoxd">Reportes destacados y subidos recientemente por la comunidad SIP.</p>
+          <table class="tabladelideres">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+              <tr>
+                <td colspan="3" class="tablavacia">Cargando reportes...</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </main>
+
+      <section id="mis-reportes-screen">
+        <article class="tarjetitamodal" style="max-width: 600px">
+          <a href="#" class="flechaparatras" id="cerrarMisReportes">← VOLVER</a>
+          <h2>TUS REPORTES</h2>
+          <article class="listademisreportes" id="misReportesLista">
+            <p class="tablavacia">Cargando tus reportes...</p>
+          </article>
+        </article>
+      </section>
+
+      <section id="soporte-screen">
+        <article class="tarjetitamodal modalsoporte">
+          <a href="#" class="flechaparatras" id="cerrarSoporte">← VOLVER</a>
+          <h2>SOPORTE</h2>
+          <section class="contenidosoporte">
+            <img class="avatarsoporte" src="Imagen/REPORTES LOGO.png" alt="Reportes SIP"/>
+            <article class="infosoporte">
+              <h3>CYBERTILINES TEAM</h3>
+              <p><strong>Teléfono:</strong> +56 9 7221 5314</p>
+              <p><strong>Correo:</strong> cybertilines@gmail.com</p>
+            </article>
+          </section>
+          <p class="notasoporte">
+            Cualquier duda o consulta, en caso de no querer contactarnos
+            directamente, puedes ir a inspectoría o hacia convivencia a hacer tu
+            consulta.
+          </p>
+        </article>
+      </section>
+    </section>
+
+    <!-- Carga única de script auth.js -->
+    <script type="module" src="auth.js"></script>
+  </body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta - CyberTilines</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Open+Sans:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="cuenta.css">
+    <link rel="icon" href="Imagen/REPORTES LOGO.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+</head>
+<body class="cuerpocuenta">
+    <script type="module" src="auth.js" defer></script>
+
+    <section id="loading-screen-cuenta" class="pantallacargando" aria-label="Pantalla de carga del sistema">
+        <h1 class="titulocargando">SISTEMA // CONECTANDO...</h1>
+        <figure class="contenedorbarra" aria-hidden="true">
+            <span class="progresobarra"></span>
+        </figure>
+        <p class="estadocargando">SINCRO_DATA_USER_REF: OK</p>
+    </section>
+
+    <figure class="fondologin" aria-hidden="true">
+        <span class="cajatextofondo">
+            <span class="textoquemueve" id="texto-marquesina-fondo"></span>
+        </span>
+    </figure>
+
+    <nav aria-label="Navegación de retorno">
+        <a href="index.html" class="botonparavolver">← Volver</a>
+    </nav>
+
+    <section class="contenedor grillacuenta">
+        <aside class="menudelagrasasupongo">
+            <svg class="esquinasvg arribaizq" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M 0 35 L 35 0" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+                <path d="M 0 50 L 19 31" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+                <path d="M 31 19 L 50 0" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+            </svg>
+            
+            <svg class="esquinasvg abajoder" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M 70 35 L 35 70" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+                <path d="M 20 70 L 39 51" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+                <path d="M 51 39 L 70 20" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+            </svg>
+            
+            <nav class="navegacionmenu" aria-label="Menú de configuración">
+                <button class="enlacemenu activo" id="tab-cuenta">
+                    Cuenta <span class="cursorparpadea">◀</span>
+                </button>
+                <button class="enlacemenu" id="tab-seguridad">
+                    Seguridad <span class="cursorparpadea" style="display: none;">◀</span>
+                </button>
+            </nav>
+        </aside>
+
+        <main class="panelcentral animacionentrada" id="panel-contenedor">
+            <svg class="esquinasvg arribaizq" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M 0 35 L 35 0" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+                <path d="M 0 50 L 19 31" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+                <path d="M 31 19 L 50 0" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+            </svg>
+            
+            <svg class="esquinasvg abajoder" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M 70 35 L 35 70" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+                <path d="M 20 70 L 39 51" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+                <path d="M 51 39 L 70 20" stroke="#ffcc00" stroke-width="3" stroke-linecap="square"/>
+            </svg>
+
+            <article class="envolvedorcontenido">
+                <section id="seccion-perfil" class="seccioncuenta transicioncontenido activo">
+                    <h3 class="tituloborde">01. PERFIL</h3>
+                    
+                    <header class="contenedorcabeceraperfil">
+                        <figure class="envolvedorbanner">
+                            <span class="vistapreviabanner" id="banner-preview"></span>
+                            <button type="button" class="botoncambiarbanner" id="btn-cambiar-portada">
+                                Cambiar banner
+                            </button>
+                            <input type="file" id="input-archivo-portada" accept="image/*" style="display: none;">
+                        </figure>
+
+                        <section class="filaidentidad">
+                            <figure class="envolvedoravatar">
+                                <span class="marcocircular">
+                                    <span class="avatarvacio" id="avatar-letra">M</span>
+                                    <label for="input-archivo-foto" class="camaraencima" title="Cambiar foto de perfil">📷</label>
+                                </span>
+                                <input type="file" id="input-archivo-foto" accept="image/*" style="display: none;">
+                            </figure>
+
+                            <article class="textoidentidad">
+                                <h2 class="nombreusuario">
+                                    <span id="user-display-name">Cargando...</span>
+                                    <span id="user-small-username" class="nombrechiquito"></span>
+                                </h2>
+                                <span id="user-display-email" class="correousuario"></span>
+                            </article>
+
+                            <aside class="estosemeolvidoparaqueeraxdd" aria-label="Indicadores de tamaño de imagen">
+                                <span>ℹ Perfil: <strong>200×200 px</strong></span>
+                                <span>Portada: <strong>700×430 px</strong></span>
+                            </aside>
+                        </section>
+                    </header>
+
+                    <section class="contenedorinputs">
+                        <form class="formulariocustom" id="form-perfil" onsubmit="return false;">
+                            <fieldset style="border: none; padding: 0; margin: 0;">
+                                <p class="grupodeinputs">
+                                    <label for="userUsername">USERNAME VISIBLE (APARECERÁ ENTRE PARÉNTESIS)</label>
+                                    <input type="text" id="userUsername" placeholder="Ej: MilaDev">
+                                </p>
+                                
+                                <p class="grupodeinputs">
+                                    <label for="userBio">DESCRIPCIÓN DE USUARIO</label>
+                                    <textarea id="userBio" rows="4" placeholder="Cuéntanos un poco sobre ti o tu rol..."></textarea>
+                                </p>
+                                
+                                <button type="button" id="btnGuardarPerfil" class="botonpaenviar">GUARDAR CAMBIOS</button>
+                                <p id="msg-guardado" style="color: #ffcc00; font-family: 'Open Sans', sans-serif; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 600;" aria-live="polite"></p>
+                            </fieldset>
+                        </form>
+                    </section>
+                </section>
+
+                <section id="seccion-seguridad" class="seccioncuenta transicioncontenido" style="display: none;">
+                    <h3 class="tituloborde">02. SEGURIDAD DEL SISTEMA</h3>
+                    <form class="formulariocustom" id="form-seguridad" style="max-width: 700px;" onsubmit="return false;">
+                        <fieldset style="border: none; padding: 0; margin: 0;">
+                            <p class="grupodeinputs">
+                                <label for="passActual">CONTRASEÑA ACTUAL</label>
+                                <input type="password" id="passActual" placeholder="••••••••">
+                            </p>
+                            <p class="grupodeinputs">
+                                <label for="passNueva">NUEVA CONTRASEÑA</label>
+                                <input type="password" id="passNueva" placeholder="••••••••">
+                            </p>
+                            <p class="grupodeinputs">
+                                <label for="passConfirmar">CONFIRMAR NUEVA CONTRASEÑA</label>
+                                <input type="password" id="passConfirmar" placeholder="••••••••">
+                            </p>
+                            <button type="button" id="btnGuardarSeguridad" class="botonpaenviar">ACTUALIZAR CONTRASEÑA</button>
+                            <p id="msg-seguridad" style="color: #ffcc00; font-family: 'Open Sans', sans-serif; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 600;" aria-live="polite"></p>
+                        </fieldset>
+                    </form>
+                </section>
+            </article>
+        </main>
+    </section>
+
+    <section id="modal-recorte" class="modalrecorte" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-perfil-titulo">
+        <article class="contenidomodal">
+            <h3 id="modal-perfil-titulo">AJUSTAR FOTO DE PERFIL</h3>
+            <figure class="contenedorvista">
+                <img id="imagen-a-recortar" src="" alt="Previsualización">
+            </figure>
+            <nav class="botonesmodal" aria-label="Controles de recorte">
+                <button id="btn-cancelar-corte" class="botoncancelar">CANCELAR</button>
+                <button id="btn-guardar-corte" class="botonpaenviar" style="margin-top: 0;">APLICAR AJUSTE</button>
+            </nav>
+        </article>
+    </section>
+
+    <section id="modal-recorte-banner" class="modalrecorte" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-banner-titulo">
+        <article class="contenidomodal" style="max-width: 860px; width: 92%;">
+            <h3 id="modal-banner-titulo">AJUSTAR FOTO DE PORTADA</h3>
+            <p style="font-family:'Open Sans',sans-serif; font-size:12px; color:rgba(255,255,255,0.5); margin-bottom:14px; font-weight:600;">
+                Arrastra y ajusta la imagen — proporción 700×430
+            </p>
+            <figure class="contenedorvistabanner">
+                <img id="imagen-a-recortar-banner" src="" alt="Previsualización portada">
+            </figure>
+            <nav class="botonesmodal" aria-label="Controles de recorte portada">
+                <button id="btn-cancelar-corte-banner" class="botoncancelar">CANCELAR</button>
+                <button id="btn-guardar-corte-banner" class="botonpaenviar" style="margin-top: 0;">APLICAR AJUSTE</button>
+            </nav>
+        </article>
+    </section>
+</body>
+</html>
