@@ -427,6 +427,11 @@ body {
     color: var(--gold);
 }
 
+.archivosdesactivados {
+    color: #888;
+    font-size: 0.72rem;
+}
+
 .grupodeinputs input,
 .grupodeinputs textarea,
 .grupodeinputs select {
@@ -439,8 +444,34 @@ body {
 }
 
 .inputdearchivo {
+    padding: 7px !important;
+    border: 1px dashed rgba(255, 204, 0, 0.55) !important;
+    background: rgba(255, 204, 0, 0.04) !important;
     font-size: 0.85rem;
     color: #aaa;
+}
+
+/* aqui se cambia el boton normal de seleccionar archivo */
+.inputdearchivo::file-selector-button {
+    margin-right: 12px;
+    padding: 8px 13px;
+    border: 0;
+    border-radius: 3px;
+    background: var(--gold);
+    color: #0a0a0f;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.inputdearchivo:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.inputdearchivo:disabled::file-selector-button {
+    cursor: not-allowed;
 }
 
 .contenedorrecordar {
