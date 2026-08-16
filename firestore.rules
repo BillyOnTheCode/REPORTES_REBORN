@@ -1,0 +1,115 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function tieneSesion() {
+      return request.auth != null;
+    }
+
+    function correoActual() {
+      return request.auth.token.get('email', '').lower();
+    }
+
+    function esInspectorMayor() {
+      return tieneSesion() &&
+        correoActual() == 'rodrigo.rojas.arbayza@alumnos.sip.cl';
+    }
+
+    function rolDeLaCuenta() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.get('rol', '');
+    }
+
+    function esInspector() {
+      return tieneSesion() && (
+        esInspectorMayor() ||
+        rolDeLaCuenta() == 'inspector' ||
+        rolDeLaCuenta() == 'inspector_mayor'
+      );
+    }
+
+    function rolNormal(correo) {
+      return correo.lower().matches('.*@sip\\.cl$') ? 'profesor' : 'alumno';
+    }
+
+    match /usuarios/{usuarioId} {
+      // cada usuario puede crear solamente su propio perfil
+      allow create: if tieneSesion() &&
+        request.auth.uid == usuarioId &&
+        request.resource.data.correo.lower() == correoActual() &&
+        (
+          (esInspectorMayor() && request.resource.data.rol == 'inspector_mayor') ||
+          (!esInspectorMayor() && request.resource.data.rol == rolNormal(correoActual()))
+        );
+
+      // los inspectores necesitan ver las cuentas para poder dar el rol
+      allow read: if tieneSesion() && (
+        request.auth.uid == usuarioId || esInspector()
+      );
+
+      // un usuario normal solo puede cambiar su apodo y su biografia
+      allow update: if tieneSesion() && (
+        (
+          request.auth.uid == usuarioId &&
+          request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['username', 'bio'])
+        ) ||
+        puedeCambiarRol()
+      );
+
+      allow delete: if false;
+
+      function puedeCambiarRol() {
+        let cambios = request.resource.data.diff(resource.data).affectedKeys();
+        let correoCuenta = resource.data.correo.lower();
+        let rolAnterior = resource.data.get('rol', rolNormal(correoCuenta));
+        let rolNuevo = request.resource.data.rol;
+
+        return cambios.hasOnly(['rol']) && (
+          (
+            esInspectorMayor() &&
+            correoCuenta != 'rodrigo.rojas.arbayza@alumnos.sip.cl' &&
+            (rolNuevo == 'inspector' || rolNuevo == rolNormal(correoCuenta))
+          ) ||
+          (
+            !esInspectorMayor() &&
+            esInspector() &&
+            rolAnterior != 'inspector' &&
+            rolAnterior != 'inspector_mayor' &&
+            rolNuevo == 'inspector'
+          )
+        );
+      }
+    }
+
+    match /reportes/{reporteId} {
+      // un alumno puede ver los aprobados y tambien sus propios reportes
+      allow read: if esInspector() || (
+        tieneSesion() && (
+          resource.data.estado == 'aprobado' ||
+          resource.data.autorUID == request.auth.uid
+        )
+      );
+
+      // todos los reportes nuevos tienen que empezar pendientes
+      allow create: if tieneSesion() &&
+        request.resource.data.autorUID == request.auth.uid &&
+        request.resource.data.estado == 'pendiente' &&
+        request.resource.data.prioridad == 'sin_asignar';
+
+      // los inspectores solo cambian los datos de la revision
+      allow update: if esInspector() &&
+        resource.data.get('estado', 'pendiente') == 'pendiente' &&
+        request.resource.data.estado in ['aprobado', 'descartado'] &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'categoria',
+          'prioridad',
+          'estado',
+          'revisadoPor',
+          'revisadoCorreo',
+          'revisadoEn'
+        ]);
+
+      allow delete: if false;
+    }
+  }
+}

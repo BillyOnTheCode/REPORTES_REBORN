@@ -1,0 +1,350 @@
+.panelinspectores {
+    padding-top: 38px;
+    padding-bottom: 80px;
+}
+
+.tituloinspector,
+.botonesinspector {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.tituloinspector .flechaparatras {
+    margin: 0;
+    text-decoration: none;
+}
+
+.insigniarol {
+    padding: 7px 10px;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 0.68rem;
+    font-weight: bold;
+}
+
+.avisoprivado {
+    margin-bottom: 28px;
+    padding: 12px 15px;
+    border-left: 5px solid var(--gold);
+    background: rgba(255, 204, 0, 0.08);
+    color: var(--gold);
+    font-size: 0.78rem;
+    font-weight: bold;
+}
+
+.pestanasinspector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #30343d;
+}
+
+.pestanainspector {
+    padding: 13px 18px;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: #888;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.76rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.pestanainspector.activa {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.seccioninspector {
+    display: none;
+}
+
+.seccioninspector.activa {
+    display: block;
+}
+
+.encabezadoseccion {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+}
+
+.encabezadoseccion p {
+    margin: 0 0 4px;
+    color: var(--gold);
+    font-weight: bold;
+}
+
+.encabezadoseccion h2 {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.explicacionseccion {
+    margin: 10px 0 25px;
+    color: #a3a3a3;
+}
+
+.botonactualizar,
+.botonaprobar,
+.botondescartar,
+.botonponerrol,
+.botonquitarrol {
+    padding: 10px 15px;
+    border-radius: 3px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.botonactualizar,
+.botonaprobar,
+.botonponerrol {
+    border: 1px solid var(--gold);
+    background: var(--gold);
+    color: #0a0a0f;
+}
+
+.botondescartar,
+.botonquitarrol {
+    border: 1px solid #ff5b5b;
+    background: transparent;
+    color: #ff6b6b;
+}
+
+.botonactualizar:disabled,
+.botonaprobar:disabled,
+.botondescartar:disabled,
+.botonponerrol:disabled,
+.botonquitarrol:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.listareportesinspector {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.reporteadministracion {
+    padding: 22px;
+    border: 1px solid #343741;
+    border-left: 5px solid var(--gold);
+    border-radius: 5px;
+    background: #11131a;
+}
+
+.cabecerareporteadmin {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.cabecerareporteadmin h3 {
+    margin: 5px 0 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.25rem;
+}
+
+.categoriaadmin {
+    color: var(--gold);
+    font-size: 0.68rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.fechaadmin,
+.autoradmin {
+    color: #999;
+    font-size: 0.78rem;
+}
+
+.descripcionadmin {
+    padding: 15px;
+    background: #0b0d12;
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
+
+.archivosadmin {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 15px 0;
+}
+
+.archivosadmin a {
+    color: var(--gold);
+    font-size: 0.78rem;
+}
+
+.sinarchivosadmin {
+    color: #777;
+    font-size: 0.78rem;
+}
+
+.opcionesreporte {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.opcionesreporte label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: var(--gold);
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.opcionesreporte select {
+    padding: 10px;
+    border: 1px solid #3a3d46;
+    border-radius: 3px;
+    background: #0c0e13;
+    color: #fff;
+}
+
+.accionesreporte {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.mensajetarjeta {
+    margin-bottom: 0;
+    color: var(--gold);
+    font-size: 0.78rem;
+}
+
+.listacuentas {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.tarjetacuentaadmin {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 175px;
+    align-items: center;
+    gap: 18px;
+    padding: 15px 18px;
+    border: 1px solid #343741;
+    background: #11131a;
+}
+
+.datoscuentaadmin h3 {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+}
+
+.datoscuentaadmin p {
+    margin: 0;
+    color: #929292;
+    font-size: 0.75rem;
+}
+
+.etiquetarol {
+    padding: 5px 8px;
+    border: 1px solid #555;
+    color: #bbb;
+    font-size: 0.62rem;
+    font-weight: bold;
+}
+
+.etiquetarol.inspector,
+.etiquetarol.inspector_mayor {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.accioncuenta {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.sinaccion {
+    color: #777;
+    font-size: 0.68rem;
+    text-align: right;
+}
+
+.mensajeadmin {
+    padding: 28px;
+    border: 1px dashed #444852;
+    color: #888;
+    text-align: center;
+}
+
+.errormensaje {
+    color: #ff6b6b;
+}
+
+body.light-theme .explicacionseccion,
+body.light-theme .fechaadmin,
+body.light-theme .autoradmin,
+body.light-theme .datoscuentaadmin p {
+    color: #475569;
+}
+
+body.light-theme .reporteadministracion,
+body.light-theme .tarjetacuentaadmin {
+    border-color: #cbd5e1;
+    background: #f7eeda;
+    color: #0f172a;
+}
+
+body.light-theme .descripcionadmin,
+body.light-theme .opcionesreporte select {
+    background: #fffaf0;
+    color: #0f172a;
+}
+
+@media (max-width: 760px) {
+    .tituloinspector,
+    .botonesinspector,
+    .contenidocabecera {
+        flex-wrap: wrap;
+    }
+
+    .botonesinspector {
+        width: 100%;
+    }
+
+    .pestanasinspector,
+    .accionesreporte {
+        flex-direction: column;
+    }
+
+    .pestanainspector {
+        text-align: left;
+    }
+
+    .encabezadoseccion,
+    .cabecerareporteadmin {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .opcionesreporte {
+        grid-template-columns: 1fr;
+    }
+
+    .tarjetacuentaadmin {
+        grid-template-columns: 1fr;
+    }
+
+    .accioncuenta {
+        justify-content: flex-start;
+    }
+
+    .sinaccion {
+        text-align: left;
+    }
+}

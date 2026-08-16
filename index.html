@@ -29,6 +29,9 @@
         <li>
           <a href="Historial.html" class="enlacemenuxd">Historial de Reportes<span class="flechitamenu">›</span></a>
         </li>
+        <li id="menuAdministracion" style="display: none;">
+          <a href="inspectores.html" class="enlacemenuxd">Administración<span class="flechitamenu">›</span></a>
+        </li>
         <li>
           <a href="#" class="enlacemenuxd" id="abrirMisReportes">Tus Reportes<span class="flechitamenu">›</span></a>
         </li>
@@ -437,6 +440,7 @@
       const EMAILJS_PUBLIC_KEY = "Fdr9w_UZ6HPs_dxC0";
       const EMAILJS_SERVICE_ID = "service_u15cewk";
       const EMAILJS_TEMPLATE_ID = "template_xbxkyjk";
+      const CORREO_INSPECTOR_MAYOR = "rodrigo.rojas.arbayza@alumnos.sip.cl";
       if (window.emailjs) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
       const firebaseConfig = {
@@ -520,6 +524,12 @@
           .then(async (userCredential) => {
             const user = userCredential.user;
             const nombreAsignado = extraerNombreDesdeCorreo(email);
+            let rolInicial = email.endsWith("@sip.cl") ? "profesor" : "alumno";
+
+            // esta es la cuenta que inicia como inspector mayor
+            if (email === CORREO_INSPECTOR_MAYOR) {
+              rolInicial = "inspector_mayor";
+            }
 
             await setDoc(doc(db, "usuarios", user.uid), {
               nombreReal: nombreAsignado,
@@ -527,6 +537,7 @@
               rut: rut,
               username: "",
               bio: "",
+              rol: rolInicial,
               creadoEn: new Date(),
             });
 
@@ -589,6 +600,7 @@
         if (user) {
           loginScreen.style.display = "none";
           mainContent.style.display = "block";
+          revisarAccesoInspector(user);
         } else {
           loginScreen.style.display = "flex";
           mainContent.style.display = "none";
@@ -614,6 +626,23 @@
 
         cargarLeaderboard();
       });
+
+      // aqui se muestra el menu solo a inspectores
+      async function revisarAccesoInspector(user) {
+        const menuAdministracion = document.getElementById("menuAdministracion");
+
+        try {
+          const perfil = await getDoc(doc(db, "usuarios", user.uid));
+          const rol = perfil.exists() ? perfil.data().rol || "" : "";
+          const esMayor = user.email.toLowerCase() === CORREO_INSPECTOR_MAYOR;
+
+          if (rol === "inspector" || rol === "inspector_mayor" || esMayor) {
+            menuAdministracion.style.display = "block";
+          }
+        } catch (error) {
+          console.error("No se pudo revisar el rol:", error);
+        }
+      }
 
       const reportScreen = document.getElementById("report-screen");
       const misReportesScreen = document.getElementById("mis-reportes-screen");
@@ -759,7 +788,7 @@
         const tbody = document.getElementById("leaderboardBody");
         if (!tbody) return;
         try {
-          const q = query(collection(db, "reportes"), orderBy("fecha", "desc"), limit(10));
+          const q = query(collection(db, "reportes"), where("estado", "==", "aprobado"));
           const snap = await getDocs(q);
 
           if (snap.empty) {
@@ -767,9 +796,20 @@
             return;
           }
 
-          tbody.innerHTML = "";
+          let reportesAprobados = [];
           snap.forEach((docSnap) => {
-            const r = docSnap.data();
+            reportesAprobados.push(docSnap.data());
+          });
+
+          // se ordenan aqui para no pedir otro indice en firebase
+          reportesAprobados.sort((a, b) => {
+            const fechaA = a.fecha && a.fecha.toMillis ? a.fecha.toMillis() : 0;
+            const fechaB = b.fecha && b.fecha.toMillis ? b.fecha.toMillis() : 0;
+            return fechaB - fechaA;
+          });
+
+          tbody.innerHTML = "";
+          reportesAprobados.slice(0, 10).forEach((r) => {
             const nombreMostrado = r.anonimo
               ? '<span class="medallaanonimo">Anónimo</span>'
               : escapeHTML(r.autorNombre || "Usuario") + (r.autorUsername ? ` <span class="nombreautor">(${escapeHTML(r.autorUsername)})</span>` : "");
