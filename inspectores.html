@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ADMINISTRACION - CyberTilines</title>
+    <link rel="stylesheet" href="paginaProyecto_CYBERTILINES.css" />
+    <link rel="stylesheet" href="inspectores_estilos.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="icon" href="Archivos/imagen/REPORTES LOGO.png" type="image/png" />
+    <script src="auth.js" defer></script>
+  </head>
+  <body>
+    <div id="guard-loading-screen">
+      <div class="titulocargando">SISTEMA // REVISANDO PERMISOS...</div>
+      <div class="contenedorbarra">
+        <div class="progresobarra"></div>
+      </div>
+      <div class="estadocargando">Comprobando cuenta de inspector...</div>
+    </div>
+
+    <header class="cabeceraprincipal">
+      <div class="contenedor contenidocabecera">
+        <div class="tituloinspector">
+          <a href="index.html" class="flechaparatras">← INICIO</a>
+          <div class="areadellogo">
+            <h1>PANEL DE <span class="textoamarillo">INSPECTORES</span></h1>
+            <p class="subtituloxd">Cyber<span class="textoblanco">Tilines</span></p>
+          </div>
+        </div>
+
+        <div class="botonesinspector">
+          <span id="rolActualTexto" class="insigniarol"></span>
+          <button id="themeBtn" class="botoncerrarsesion">CAMBIAR ASPECTO</button>
+          <button id="btnCerrarSesionInspector" class="botoncerrarsesion">CERRAR SESIÓN</button>
+        </div>
+      </div>
+      <div class="lineacabecera"></div>
+    </header>
+
+    <main class="contenedor panelinspectores">
+      <div class="avisoprivado">
+        // ESTA INFORMACION ES PRIVADA Y SOLO LA PUEDEN VER LOS INSPECTORES
+      </div>
+
+      <nav class="pestanasinspector">
+        <button id="tabReportes" class="pestanainspector activa">REPORTES PENDIENTES</button>
+        <button id="tabCuentas" class="pestanainspector">ADMINISTRAR INSPECTORES</button>
+      </nav>
+
+      <section id="seccionReportes" class="seccioninspector activa">
+        <div class="encabezadoseccion">
+          <div>
+            <p>// REVISION</p>
+            <h2>REPORTES POR REVISAR</h2>
+          </div>
+          <button id="actualizarReportes" class="botonactualizar">ACTUALIZAR</button>
+        </div>
+        <p class="explicacionseccion">
+          Revisa si el reporte es real, escoge su prioridad y despues apruebalo o descartalo.
+        </p>
+        <div id="listaReportesPendientes" class="listareportesinspector">
+          <p class="mensajeadmin">Cargando reportes pendientes...</p>
+        </div>
+      </section>
+
+      <section id="seccionCuentas" class="seccioninspector">
+        <div class="encabezadoseccion">
+          <div>
+            <p>// CUENTAS</p>
+            <h2>INSPECTORES DEL SISTEMA</h2>
+          </div>
+          <button id="actualizarCuentas" class="botonactualizar">ACTUALIZAR</button>
+        </div>
+        <p id="textoPermisoCuentas" class="explicacionseccion"></p>
+        <div id="listaCuentas" class="listacuentas">
+          <p class="mensajeadmin">Cargando cuentas...</p>
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        collection,
+        getDocs,
+        query,
+        where,
+        updateDoc,
+        serverTimestamp,
+      } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCx6yFD14dDDbt2ClRDzhYIhnGgyuhIW-c",
+        authDomain: "proyectopaginacybertilinesrebo.firebaseapp.com",
+        projectId: "proyectopaginacybertilinesrebo",
+        storageBucket: "proyectopaginacybertilinesrebo.firebasestorage.app",
+        messagingSenderId: "795048144847",
+        appId: "1:795048144847:web:82ddeed1a837775925acba",
+      };
+
+      const CORREO_INSPECTOR_MAYOR = "rodrigo.rojas.arbayza@alumnos.sip.cl";
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      const guardLoadingScreen = document.getElementById("guard-loading-screen");
+      const listaReportes = document.getElementById("listaReportesPendientes");
+      const listaCuentas = document.getElementById("listaCuentas");
+      let usuarioActual = null;
+      let rolActual = "";
+
+      // aqui se revisa si la cuenta puede entrar al panel
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        usuarioActual = user;
+
+        try {
+          const perfil = await getDoc(doc(db, "usuarios", user.uid));
+          rolActual = perfil.exists() ? perfil.data().rol || "" : "";
+
+          if (user.email.toLowerCase() === CORREO_INSPECTOR_MAYOR) {
+            rolActual = "inspector_mayor";
+          }
+
+          if (rolActual !== "inspector" && rolActual !== "inspector_mayor") {
+            alert("Esta parte es solamente para inspectores.");
+            window.location.href = "index.html";
+            return;
+          }
+
+          document.getElementById("rolActualTexto").innerText = nombreDelRol(rolActual);
+          actualizarTextoPermisos();
+          await cargarReportesPendientes();
+          await cargarCuentas();
+        } catch (error) {
+          console.error(error);
+          alert("No se pudo revisar el permiso de la cuenta.");
+          window.location.href = "index.html";
+          return;
+        } finally {
+          ocultarCarga();
+        }
+      });
+
+      document.getElementById("btnCerrarSesionInspector").addEventListener("click", () => {
+        signOut(auth).then(() => {
+          window.location.href = "index.html";
+        });
+      });
+
+      // aqui se cambian las dos partes del panel
+      document.getElementById("tabReportes").addEventListener("click", () => {
+        cambiarPestana("reportes");
+      });
+
+      document.getElementById("tabCuentas").addEventListener("click", () => {
+        cambiarPestana("cuentas");
+      });
+
+      function cambiarPestana(nombre) {
+        const mostrarReportes = nombre === "reportes";
+        document.getElementById("tabReportes").classList.toggle("activa", mostrarReportes);
+        document.getElementById("tabCuentas").classList.toggle("activa", !mostrarReportes);
+        document.getElementById("seccionReportes").classList.toggle("activa", mostrarReportes);
+        document.getElementById("seccionCuentas").classList.toggle("activa", !mostrarReportes);
+      }
+
+      document.getElementById("actualizarReportes").addEventListener("click", cargarReportesPendientes);
+      document.getElementById("actualizarCuentas").addEventListener("click", cargarCuentas);
+
+      // aqui se buscan los reportes que todavia no han sido revisados
+      async function cargarReportesPendientes() {
+        listaReportes.innerHTML = '<p class="mensajeadmin">Cargando reportes pendientes...</p>';
+
+        try {
+          const resultado = await getDocs(collection(db, "reportes"));
+          let reportes = [];
+
+          resultado.forEach((reporteDoc) => {
+            const datos = reporteDoc.data();
+
+            // los reportes viejos no tenian estado, tambien se toman como pendientes
+            if (!datos.estado || datos.estado === "pendiente") {
+              reportes.push({
+                id: reporteDoc.id,
+                ...datos,
+              });
+            }
+          });
+
+          reportes.sort((a, b) => obtenerTiempo(b.fecha) - obtenerTiempo(a.fecha));
+
+          if (reportes.length === 0) {
+            listaReportes.innerHTML = '<p class="mensajeadmin">No hay reportes pendientes por ahora.</p>';
+            return;
+          }
+
+          listaReportes.innerHTML = "";
+          reportes.forEach((reporte) => {
+            listaReportes.appendChild(crearReporte(reporte));
+          });
+        } catch (error) {
+          console.error(error);
+          listaReportes.innerHTML = '<p class="mensajeadmin errormensaje">No se pudieron cargar los reportes.</p>';
+        }
+      }
+
+      function crearReporte(reporte) {
+        const tarjeta = document.createElement("article");
+        tarjeta.className = "reporteadministracion";
+        const autor = reporte.anonimo ? "Anonimo para estudiantes" : reporte.autorNombre || "Usuario SIP";
+
+        tarjeta.innerHTML = `
+          <div class="cabecerareporteadmin">
+            <div>
+              <span class="categoriaadmin">${escapeHTML(nombreCategoria(reporte.categoria))}</span>
+              <h3>${escapeHTML(reporte.titulo || "Reporte sin titulo")}</h3>
+            </div>
+            <span class="fechaadmin">${obtenerFecha(reporte.fecha)}</span>
+          </div>
+          <p class="autoradmin"><strong>Enviado por:</strong> ${escapeHTML(autor)} (${escapeHTML(reporte.autorCorreo || "sin correo")})</p>
+          <p class="descripcionadmin">${escapeHTML(reporte.descripcion || "Sin descripcion")}</p>
+          <div class="archivosadmin"></div>
+          <div class="opcionesreporte">
+            <label>
+              CATEGORIA
+              <select class="selectcategoriaadmin">
+                <option value="material">Material institucional</option>
+                <option value="convivencia">Convivencia escolar</option>
+                <option value="bullying">Bullying</option>
+                <option value="acoso">Acoso</option>
+                <option value="otro">Otro</option>
+              </select>
+            </label>
+            <label>
+              PRIORIDAD
+              <select class="selectprioridadadmin">
+                <option value="baja">Baja</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+                <option value="urgente">Urgente</option>
+              </select>
+            </label>
+          </div>
+          <div class="accionesreporte">
+            <button class="botonaprobar">APROBAR REPORTE</button>
+            <button class="botondescartar">DESCARTAR</button>
+          </div>
+          <p class="mensajetarjeta"></p>
+        `;
+
+        const categoriaSelect = tarjeta.querySelector(".selectcategoriaadmin");
+        const prioridadSelect = tarjeta.querySelector(".selectprioridadadmin");
+        categoriaSelect.value = nombreCategoriaValor(reporte.categoria);
+
+        if (reporte.prioridad && reporte.prioridad !== "sin_asignar") {
+          prioridadSelect.value = reporte.prioridad;
+        } else {
+          prioridadSelect.value = "media";
+        }
+
+        mostrarArchivos(reporte, tarjeta.querySelector(".archivosadmin"));
+
+        tarjeta.querySelector(".botonaprobar").addEventListener("click", () => {
+          revisarReporte(reporte.id, "aprobado", categoriaSelect.value, prioridadSelect.value, tarjeta);
+        });
+
+        tarjeta.querySelector(".botondescartar").addEventListener("click", () => {
+          revisarReporte(reporte.id, "descartado", categoriaSelect.value, prioridadSelect.value, tarjeta);
+        });
+
+        return tarjeta;
+      }
+
+      async function revisarReporte(id, estado, categoria, prioridad, tarjeta) {
+        const mensaje = tarjeta.querySelector(".mensajetarjeta");
+        const botones = tarjeta.querySelectorAll("button");
+
+        if (estado === "descartado" && !confirm("¿Seguro que quieres descartar este reporte?")) {
+          return;
+        }
+
+        botones.forEach((boton) => boton.disabled = true);
+        mensaje.innerText = "Guardando revision...";
+
+        try {
+          await updateDoc(doc(db, "reportes", id), {
+            categoria: categoria,
+            prioridad: prioridad,
+            estado: estado,
+            revisadoPor: usuarioActual.uid,
+            revisadoCorreo: usuarioActual.email,
+            revisadoEn: serverTimestamp(),
+          });
+
+          tarjeta.remove();
+
+          if (!listaReportes.querySelector(".reporteadministracion")) {
+            listaReportes.innerHTML = '<p class="mensajeadmin">No hay reportes pendientes por ahora.</p>';
+          }
+        } catch (error) {
+          console.error(error);
+          mensaje.innerText = "No se pudo guardar la revision.";
+          mensaje.className = "mensajetarjeta errormensaje";
+          botones.forEach((boton) => boton.disabled = false);
+        }
+      }
+
+      // aqui se cargan las cuentas para poder elegir inspectores
+      async function cargarCuentas() {
+        listaCuentas.innerHTML = '<p class="mensajeadmin">Cargando cuentas...</p>';
+
+        try {
+          const resultado = await getDocs(collection(db, "usuarios"));
+          let cuentas = [];
+
+          resultado.forEach((cuentaDoc) => {
+            cuentas.push({
+              id: cuentaDoc.id,
+              ...cuentaDoc.data(),
+            });
+          });
+
+          cuentas.sort((a, b) => (a.nombreReal || "").localeCompare(b.nombreReal || ""));
+          listaCuentas.innerHTML = "";
+
+          cuentas.forEach((cuenta) => {
+            listaCuentas.appendChild(crearCuenta(cuenta));
+          });
+        } catch (error) {
+          console.error(error);
+          listaCuentas.innerHTML = '<p class="mensajeadmin errormensaje">No se pudieron cargar las cuentas.</p>';
+        }
+      }
+
+      function crearCuenta(cuenta) {
+        const tarjeta = document.createElement("article");
+        tarjeta.className = "tarjetacuentaadmin";
+        const correo = (cuenta.correo || "").toLowerCase();
+        let rol = cuenta.rol || rolNormalDelCorreo(correo);
+
+        if (correo === CORREO_INSPECTOR_MAYOR) {
+          rol = "inspector_mayor";
+        }
+
+        tarjeta.innerHTML = `
+          <div class="datoscuentaadmin">
+            <h3>${escapeHTML(cuenta.nombreReal || "Usuario sin nombre")}</h3>
+            <p>${escapeHTML(correo || "Sin correo")}</p>
+          </div>
+          <span class="etiquetarol ${rol}">${nombreDelRol(rol)}</span>
+          <div class="accioncuenta"></div>
+        `;
+
+        const acciones = tarjeta.querySelector(".accioncuenta");
+
+        if (rol === "inspector_mayor") {
+          acciones.innerHTML = '<span class="sinaccion">Cuenta principal</span>';
+        } else if (rol === "inspector") {
+          if (rolActual === "inspector_mayor") {
+            const botonQuitar = document.createElement("button");
+            botonQuitar.className = "botonquitarrol";
+            botonQuitar.innerText = "QUITAR ROL";
+            botonQuitar.addEventListener("click", () => {
+              quitarInspector(cuenta, tarjeta);
+            });
+            acciones.appendChild(botonQuitar);
+          } else {
+            acciones.innerHTML = '<span class="sinaccion">Solo el mayor puede quitarlo</span>';
+          }
+        } else {
+          const botonAgregar = document.createElement("button");
+          botonAgregar.className = "botonponerrol";
+          botonAgregar.innerText = "HACER INSPECTOR";
+          botonAgregar.addEventListener("click", () => {
+            ponerInspector(cuenta, tarjeta);
+          });
+          acciones.appendChild(botonAgregar);
+        }
+
+        return tarjeta;
+      }
+
+      async function ponerInspector(cuenta, tarjeta) {
+        const boton = tarjeta.querySelector("button");
+        boton.disabled = true;
+        boton.innerText = "GUARDANDO...";
+
+        try {
+          await updateDoc(doc(db, "usuarios", cuenta.id), {
+            rol: "inspector",
+          });
+          await cargarCuentas();
+        } catch (error) {
+          console.error(error);
+          boton.disabled = false;
+          boton.innerText = "NO SE PUDO GUARDAR";
+        }
+      }
+
+      async function quitarInspector(cuenta, tarjeta) {
+        if (!confirm("¿Seguro que quieres quitar el rol de inspector?")) return;
+
+        const boton = tarjeta.querySelector("button");
+        boton.disabled = true;
+        boton.innerText = "GUARDANDO...";
+
+        try {
+          await updateDoc(doc(db, "usuarios", cuenta.id), {
+            rol: rolNormalDelCorreo(cuenta.correo || ""),
+          });
+          await cargarCuentas();
+        } catch (error) {
+          console.error(error);
+          boton.disabled = false;
+          boton.innerText = "NO SE PUDO GUARDAR";
+        }
+      }
+
+      function mostrarArchivos(reporte, contenedor) {
+        let archivos = reporte.archivos || [];
+
+        if (archivos.length === 0 && reporte.archivoURL) {
+          archivos.push({
+            nombre: reporte.archivoNombre || "Archivo adjunto",
+            url: reporte.archivoURL,
+          });
+        }
+
+        if (archivos.length === 0) {
+          contenedor.innerHTML = '<span class="sinarchivosadmin">Sin archivos adjuntos</span>';
+          return;
+        }
+
+        archivos.forEach((archivo, posicion) => {
+          const enlace = document.createElement("a");
+          enlace.href = archivo.url;
+          enlace.target = "_blank";
+          enlace.rel = "noopener";
+          enlace.innerText = archivo.nombre || `Ver archivo ${posicion + 1}`;
+          contenedor.appendChild(enlace);
+        });
+      }
+
+      function actualizarTextoPermisos() {
+        const texto = document.getElementById("textoPermisoCuentas");
+
+        if (rolActual === "inspector_mayor") {
+          texto.innerText = "Puedes poner y quitar inspectores. La cuenta de inspector mayor no se puede cambiar desde aqui.";
+        } else {
+          texto.innerText = "Puedes ayudar nombrando nuevos inspectores, pero no puedes quitar el rol de otra cuenta.";
+        }
+      }
+
+      function rolNormalDelCorreo(correo) {
+        return correo.toLowerCase().endsWith("@sip.cl") ? "profesor" : "alumno";
+      }
+
+      function nombreDelRol(rol) {
+        if (rol === "inspector_mayor") return "INSPECTOR MAYOR";
+        if (rol === "inspector") return "INSPECTOR";
+        if (rol === "profesor") return "PROFESOR";
+        return "ALUMNO";
+      }
+
+      function nombreCategoria(categoria) {
+        if (categoria === "material") return "Material institucional";
+        if (categoria === "convivencia") return "Convivencia escolar";
+        if (categoria === "bullying") return "Bullying";
+        if (categoria === "acoso") return "Acoso";
+        return "Otro";
+      }
+
+      function nombreCategoriaValor(categoria) {
+        const categorias = ["material", "convivencia", "bullying", "acoso", "otro"];
+        return categorias.includes(categoria) ? categoria : "otro";
+      }
+
+      function obtenerFecha(fecha) {
+        if (fecha && fecha.toDate) return fecha.toDate().toLocaleString("es-CL");
+        return "Sin fecha";
+      }
+
+      function obtenerTiempo(fecha) {
+        if (fecha && fecha.toMillis) return fecha.toMillis();
+        return 0;
+      }
+
+      function escapeHTML(texto) {
+        const div = document.createElement("div");
+        div.innerText = texto;
+        return div.innerHTML;
+      }
+
+      function ocultarCarga() {
+        guardLoadingScreen.style.opacity = "0";
+        guardLoadingScreen.style.visibility = "hidden";
+        setTimeout(() => {
+          guardLoadingScreen.style.display = "none";
+        }, 400);
+      }
+    </script>
+  </body>
+</html>

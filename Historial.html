@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HISTORIAL DE REPORTES - CyberTilines</title>
+    <link rel="stylesheet" href="paginaProyecto_CYBERTILINES.css" />
+    <link rel="stylesheet" href="historial_estilos.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="icon" href="Archivos/imagen/REPORTES LOGO.png" type="image/png" />
+    <script src="auth.js" defer></script>
+  </head>
+  <body>
+    <div id="guard-loading-screen">
+      <div class="titulocargando">SISTEMA // CARGANDO HISTORIAL...</div>
+      <div class="contenedorbarra">
+        <div class="progresobarra"></div>
+      </div>
+      <div class="estadocargando">Buscando reportes aprobados...</div>
+    </div>
+
+    <header class="cabeceraprincipal">
+      <div class="contenedor contenidocabecera">
+        <div class="historialtitulo">
+          <a href="index.html" class="flechaparatras">← INICIO</a>
+          <div class="areadellogo">
+            <h1>HISTORIAL DE <span class="textoamarillo">REPORTES</span></h1>
+            <p class="subtituloxd">Cyber<span class="textoblanco">Tilines</span></p>
+          </div>
+        </div>
+
+        <div class="historialbotones">
+          <button id="themeBtn" class="botoncerrarsesion">CAMBIAR ASPECTO</button>
+          <button id="btnCerrarSesionHistorial" class="botoncerrarsesion">CERRAR SESIÓN</button>
+        </div>
+      </div>
+      <div class="lineacabecera"></div>
+    </header>
+
+    <main class="contenedor historialcontenedor">
+      <div class="etiquetahistorial">SOLO SE MUESTRAN REPORTES APROBADOS</div>
+
+      <section class="presentacionhistorial">
+        <p class="numeroseccion">// 01</p>
+        <h2>REPORTES DE LA COMUNIDAD SIP</h2>
+        <p>
+          Los reportes estan separados por su tipo de problema. Puedes abrir una
+          categoria y presionar una tarjeta para ver toda su informacion.
+        </p>
+      </section>
+
+      <div id="listaCategorias" class="listacategorias">
+        <p class="mensajehistorial">Cargando reportes...</p>
+      </div>
+    </main>
+
+    <div id="detalleReporteScreen" class="detallereporte-screen">
+      <div class="detallereporte-caja">
+        <button id="cerrarDetalleReporte" class="cerrardetalle">← VOLVER</button>
+        <p id="detalleCategoria" class="detallecategoria"></p>
+        <h2 id="detalleTitulo"></h2>
+
+        <div class="detallemetadatos">
+          <span id="detalleAutor"></span>
+          <span id="detalleFecha"></span>
+          <span id="detallePrioridad"></span>
+        </div>
+
+        <div class="detallelinea"></div>
+        <p id="detalleDescripcion" class="detalledescripcion"></p>
+        <div id="detalleArchivos" class="detallearchivos"></div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        getDocs,
+        query,
+        where,
+      } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCx6yFD14dDDbt2ClRDzhYIhnGgyuhIW-c",
+        authDomain: "proyectopaginacybertilinesrebo.firebaseapp.com",
+        projectId: "proyectopaginacybertilinesrebo",
+        storageBucket: "proyectopaginacybertilinesrebo.firebasestorage.app",
+        messagingSenderId: "795048144847",
+        appId: "1:795048144847:web:82ddeed1a837775925acba",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      const guardLoadingScreen = document.getElementById("guard-loading-screen");
+      const listaCategorias = document.getElementById("listaCategorias");
+      const detalleScreen = document.getElementById("detalleReporteScreen");
+
+      const nombresCategorias = {
+        material: "Material institucional",
+        convivencia: "Convivencia escolar",
+        bullying: "Bullying",
+        acoso: "Acoso",
+        otro: "Otros reportes",
+      };
+
+      // aqui se revisa que la persona tenga una sesion iniciada
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        await cargarHistorial();
+        ocultarCarga();
+      });
+
+      document.getElementById("btnCerrarSesionHistorial").addEventListener("click", () => {
+        signOut(auth).then(() => {
+          window.location.href = "index.html";
+        });
+      });
+
+      // aqui se buscan solamente los reportes que ya fueron aprobados
+      async function cargarHistorial() {
+        try {
+          const consulta = query(
+            collection(db, "reportes"),
+            where("estado", "==", "aprobado")
+          );
+          const resultado = await getDocs(consulta);
+          let reportes = [];
+
+          resultado.forEach((reporteDoc) => {
+            reportes.push({
+              id: reporteDoc.id,
+              ...reporteDoc.data(),
+            });
+          });
+
+          // los mas nuevos se colocan primero
+          reportes.sort((a, b) => obtenerTiempo(b.fecha) - obtenerTiempo(a.fecha));
+          mostrarCategorias(reportes);
+        } catch (error) {
+          console.error(error);
+          listaCategorias.innerHTML = '<p class="mensajehistorial errorhistorial">No se pudo cargar el historial.</p>';
+        }
+      }
+
+      function mostrarCategorias(reportes) {
+        listaCategorias.innerHTML = "";
+
+        Object.keys(nombresCategorias).forEach((categoria) => {
+          const reportesCategoria = reportes.filter((reporte) => {
+            const categoriaReporte = nombresCategorias[reporte.categoria] ? reporte.categoria : "otro";
+            return categoriaReporte === categoria;
+          });
+
+          const seccion = document.createElement("section");
+          seccion.className = "bloquecategoria";
+
+          const botonCategoria = document.createElement("button");
+          botonCategoria.className = "botoncategoria";
+          botonCategoria.innerHTML = `
+            <span>${nombresCategorias[categoria]}</span>
+            <span class="cantidadcategoria">${reportesCategoria.length} REPORTE(S)</span>
+            <span class="flechacategoria">⌄</span>
+          `;
+
+          const cuadricula = document.createElement("div");
+          cuadricula.className = "cuadriculareportes";
+
+          if (reportesCategoria.length === 0) {
+            cuadricula.innerHTML = '<p class="categoriavacia">No hay reportes aprobados en esta categoria.</p>';
+          } else {
+            reportesCategoria.forEach((reporte) => {
+              cuadricula.appendChild(crearTarjeta(reporte, categoria));
+            });
+          }
+
+          // esto sirve para abrir y cerrar cada categoria
+          botonCategoria.addEventListener("click", () => {
+            seccion.classList.toggle("categoria-cerrada");
+          });
+
+          seccion.appendChild(botonCategoria);
+          seccion.appendChild(cuadricula);
+          listaCategorias.appendChild(seccion);
+        });
+      }
+
+      function crearTarjeta(reporte, categoria) {
+        const tarjeta = document.createElement("article");
+        tarjeta.className = "tarjetahistorial";
+
+        const titulo = escapeHTML(reporte.titulo || "Reporte sin titulo");
+        const descripcion = escapeHTML(acortarTexto(reporte.descripcion || "Sin descripcion", 100));
+        const autor = reporte.anonimo ? "Anonimo" : escapeHTML(reporte.autorNombre || "Usuario SIP");
+        const fecha = obtenerFecha(reporte.fecha);
+        const prioridad = escapeHTML((reporte.prioridad || "sin asignar").replace("_", " "));
+
+        tarjeta.innerHTML = `
+          <div class="portadareporte">
+            <span>// ${escapeHTML(nombresCategorias[categoria])}</span>
+            <strong>REPORTE SIP</strong>
+          </div>
+          <div class="contenidotarjeta">
+            <h3>${titulo}</h3>
+            <span class="prioridadtarjeta">Prioridad: ${prioridad}</span>
+            <p>${descripcion}</p>
+            <div class="datosreporte">
+              <span>${autor}</span>
+              <span>${fecha}</span>
+            </div>
+            <button class="botonverreporte">VER DETALLE →</button>
+          </div>
+        `;
+
+        tarjeta.querySelector(".botonverreporte").addEventListener("click", () => {
+          abrirDetalle(reporte);
+        });
+
+        return tarjeta;
+      }
+
+      // aqui se pone toda la informacion dentro de la ventana
+      function abrirDetalle(reporte) {
+        const categoria = reporte.categoria || "otro";
+        const nombreCategoria = nombresCategorias[categoria] || nombresCategorias.otro;
+        const autor = reporte.anonimo ? "Anonimo" : reporte.autorNombre || "Usuario SIP";
+
+        document.getElementById("detalleCategoria").innerText = nombreCategoria;
+        document.getElementById("detalleTitulo").innerText = reporte.titulo || "Reporte sin titulo";
+        document.getElementById("detalleAutor").innerText = "Autor: " + autor;
+        document.getElementById("detalleFecha").innerText = "Fecha: " + obtenerFecha(reporte.fecha);
+        document.getElementById("detallePrioridad").innerText = "Prioridad: " + (reporte.prioridad || "sin asignar").replace("_", " ");
+        document.getElementById("detalleDescripcion").innerText = reporte.descripcion || "Sin descripcion";
+
+        mostrarArchivos(reporte);
+        detalleScreen.classList.add("is-open");
+        document.body.style.overflow = "hidden";
+      }
+
+      function mostrarArchivos(reporte) {
+        const contenedor = document.getElementById("detalleArchivos");
+        contenedor.innerHTML = "";
+        let archivos = reporte.archivos || [];
+
+        // esto es para los reportes viejos que tenian un solo archivo
+        if (archivos.length === 0 && reporte.archivoURL) {
+          archivos.push({
+            nombre: reporte.archivoNombre || "Archivo adjunto",
+            url: reporte.archivoURL,
+          });
+        }
+
+        if (archivos.length === 0) {
+          contenedor.innerHTML = '<p class="sinarchivos">Este reporte no tiene archivos adjuntos.</p>';
+          return;
+        }
+
+        const tituloArchivos = document.createElement("h3");
+        tituloArchivos.innerText = "ARCHIVOS ADJUNTOS";
+        contenedor.appendChild(tituloArchivos);
+
+        archivos.forEach((archivo, posicion) => {
+          const enlace = document.createElement("a");
+          enlace.className = "archivodetalle";
+          enlace.href = archivo.url;
+          enlace.target = "_blank";
+          enlace.rel = "noopener";
+          enlace.innerText = archivo.nombre || `Ver archivo ${posicion + 1}`;
+          contenedor.appendChild(enlace);
+        });
+      }
+
+      function cerrarDetalle() {
+        detalleScreen.classList.remove("is-open");
+        document.body.style.overflow = "";
+      }
+
+      document.getElementById("cerrarDetalleReporte").addEventListener("click", cerrarDetalle);
+
+      detalleScreen.addEventListener("click", (evento) => {
+        if (evento.target === detalleScreen) cerrarDetalle();
+      });
+
+      document.addEventListener("keydown", (evento) => {
+        if (evento.key === "Escape") cerrarDetalle();
+      });
+
+      function obtenerFecha(fecha) {
+        if (fecha && fecha.toDate) {
+          return fecha.toDate().toLocaleDateString("es-CL");
+        }
+        return "Sin fecha";
+      }
+
+      function obtenerTiempo(fecha) {
+        if (fecha && fecha.toMillis) return fecha.toMillis();
+        return 0;
+      }
+
+      function acortarTexto(texto, cantidad) {
+        if (texto.length <= cantidad) return texto;
+        return texto.slice(0, cantidad) + "...";
+      }
+
+      function escapeHTML(texto) {
+        const div = document.createElement("div");
+        div.innerText = texto;
+        return div.innerHTML;
+      }
+
+      function ocultarCarga() {
+        if (!guardLoadingScreen) return;
+        guardLoadingScreen.style.opacity = "0";
+        guardLoadingScreen.style.visibility = "hidden";
+        setTimeout(() => {
+          guardLoadingScreen.style.display = "none";
+        }, 400);
+      }
+    </script>
+  </body>
+</html>

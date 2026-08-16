@@ -29,6 +29,9 @@
         <li>
           <a href="Historial.html" class="enlacemenuxd">Historial de Reportes<span class="flechitamenu">›</span></a>
         </li>
+        <li id="menuAdministracion" style="display: none;">
+          <a href="inspectores.html" class="enlacemenuxd">Administración<span class="flechitamenu">›</span></a>
+        </li>
         <li>
           <a href="#" class="enlacemenuxd" id="abrirMisReportes">Tus Reportes<span class="flechitamenu">›</span></a>
         </li>
@@ -292,6 +295,18 @@
                   required
                 />
               </div>
+              <!-- aqui el usuario dice de que trata el problema -->
+              <div class="grupodeinputs">
+                <label>TIPO DE PROBLEMA</label>
+                <select id="reporteCategoria" required>
+                  <option value="">Selecciona una categoria</option>
+                  <option value="material">Material institucional</option>
+                  <option value="convivencia">Convivencia escolar</option>
+                  <option value="bullying">Bullying</option>
+                  <option value="acoso">Acoso</option>
+                  <option value="otro">Otro</option>
+                </select>
+              </div>
               <div class="grupodeinputs">
                 <label>DESCRIPCIÓN DEL REPORTE</label>
                 <textarea
@@ -302,8 +317,10 @@
                 ></textarea>
               </div>
               <div class="grupodeinputs">
-                <label>REPORTE (ADJUNTAR ARCHIVO)</label>
-                <input type="file" class="inputdearchivo" id="reporteArchivo" />
+                <label>REPORTE (ARCHIVOS NO DISPONIBLES POR AHORA)</label>
+                <!-- firebase pide un plan de pago para poder subir archivos -->
+                <input type="file" class="inputdearchivo" id="reporteArchivo" multiple disabled />
+                <span class="archivosdesactivados">Los archivos adjuntos se habilitaran mas adelante.</span>
               </div>
               <div class="filacheckanonimo">
                 <input type="checkbox" id="reporteAnonimo" />
@@ -425,15 +442,16 @@
       const EMAILJS_PUBLIC_KEY = "Fdr9w_UZ6HPs_dxC0";
       const EMAILJS_SERVICE_ID = "service_u15cewk";
       const EMAILJS_TEMPLATE_ID = "template_xbxkyjk";
+      const CORREO_INSPECTOR_MAYOR = "rodrigo.rojas.arbayza@alumnos.sip.cl";
       if (window.emailjs) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
       const firebaseConfig = {
-        apiKey: "AIzaSyCybJ3x7mCXGoX_QvX-lww8DNsxCMl_jrc",
-        authDomain: "proyectopaginacybertilines.firebaseapp.com",
-        projectId: "proyectopaginacybertilines",
-        storageBucket: "proyectopaginacybertilines.firebasestorage.app",
-        messagingSenderId: "515231457085",
-        appId: "1:515231457085:web:82cfc9620965f170036f54",
+        apiKey: "AIzaSyCx6yFD14dDDbt2ClRDzhYIhnGgyuhIW-c",
+        authDomain: "proyectopaginacybertilinesrebo.firebaseapp.com",
+        projectId: "proyectopaginacybertilinesrebo",
+        storageBucket: "proyectopaginacybertilinesrebo.firebasestorage.app",
+        messagingSenderId: "795048144847",
+        appId: "1:795048144847:web:82ddeed1a837775925acba",
       };
 
       const app = initializeApp(firebaseConfig);
@@ -508,6 +526,12 @@
           .then(async (userCredential) => {
             const user = userCredential.user;
             const nombreAsignado = extraerNombreDesdeCorreo(email);
+            let rolInicial = email.endsWith("@sip.cl") ? "profesor" : "alumno";
+
+            // esta es la cuenta que inicia como inspector mayor
+            if (email === CORREO_INSPECTOR_MAYOR) {
+              rolInicial = "inspector_mayor";
+            }
 
             await setDoc(doc(db, "usuarios", user.uid), {
               nombreReal: nombreAsignado,
@@ -515,6 +539,7 @@
               rut: rut,
               username: "",
               bio: "",
+              rol: rolInicial,
               creadoEn: new Date(),
             });
 
@@ -577,6 +602,7 @@
         if (user) {
           loginScreen.style.display = "none";
           mainContent.style.display = "block";
+          revisarAccesoInspector(user);
         } else {
           loginScreen.style.display = "flex";
           mainContent.style.display = "none";
@@ -602,6 +628,23 @@
 
         cargarLeaderboard();
       });
+
+      // aqui se muestra el menu solo a inspectores
+      async function revisarAccesoInspector(user) {
+        const menuAdministracion = document.getElementById("menuAdministracion");
+
+        try {
+          const perfil = await getDoc(doc(db, "usuarios", user.uid));
+          const rol = perfil.exists() ? perfil.data().rol || "" : "";
+          const esMayor = user.email.toLowerCase() === CORREO_INSPECTOR_MAYOR;
+
+          if (rol === "inspector" || rol === "inspector_mayor" || esMayor) {
+            menuAdministracion.style.display = "block";
+          }
+        } catch (error) {
+          console.error("No se pudo revisar el rol:", error);
+        }
+      }
 
       const reportScreen = document.getElementById("report-screen");
       const misReportesScreen = document.getElementById("mis-reportes-screen");
@@ -660,13 +703,14 @@
         }
 
         const titulo = document.getElementById("reporteTitulo").value.trim();
+        const categoria = document.getElementById("reporteCategoria").value;
         const descripcion = document.getElementById("reporteDescripcion").value.trim();
         const archivoInput = document.getElementById("reporteArchivo");
-        const archivo = archivoInput.files[0] || null;
+        const archivosSeleccionados = archivoInput.files;
         const anonimo = document.getElementById("reporteAnonimo").checked;
 
-        if (!titulo || !descripcion) {
-          setReporteMsg("Completa el título y la descripción.", "err");
+        if (!titulo || !categoria || !descripcion) {
+          setReporteMsg("Completa el título, la categoria y la descripción.", "err");
           return;
         }
 
@@ -680,20 +724,27 @@
           const fotoPerfilUrl = perfilSnap.exists() ? perfilSnap.data().fotoPerfilUrl || null : null;
           const usernameElegido = perfilSnap.exists() ? perfilSnap.data().username || null : null;
 
-          let archivoURL = null;
-          let archivoNombre = null;
-          if (archivo) {
-            archivoNombre = archivo.name;
-            const rutaArchivo = ref(storage, `reportes/${user.uid}/${Date.now()}_${archivo.name}`);
+          let archivos = [];
+
+          // aqui se sube cada archivo que selecciono el usuario
+          for (let i = 0; i < archivosSeleccionados.length; i++) {
+            const archivo = archivosSeleccionados[i];
+            const rutaArchivo = ref(storage, `reportes/${user.uid}/${Date.now()}_${i}_${archivo.name}`);
             await uploadBytes(rutaArchivo, archivo);
-            archivoURL = await getDownloadURL(rutaArchivo);
+            const urlArchivo = await getDownloadURL(rutaArchivo);
+
+            archivos.push({
+              nombre: archivo.name,
+              url: urlArchivo,
+            });
           }
 
+          // aqui se guardan los datos principales del reporte
           const nuevoReporte = {
             titulo,
+            categoria,
             descripcion,
-            archivoURL,
-            archivoNombre,
+            archivos,
             autorUID: user.uid,
             autorNombre: nombreReal,
             autorUsername: usernameElegido,
@@ -701,6 +752,9 @@
             autorCorreo: user.email,
             anonimo,
             destacado: false,
+            // despues el administrador podra cambiar estos dos datos
+            prioridad: "sin_asignar",
+            estado: "pendiente",
             fecha: serverTimestamp(),
           };
           await addDoc(collection(db, "reportes"), nuevoReporte);
@@ -711,7 +765,7 @@
               descripcion,
               nombre_remitente: nombreReal,
               correo_remitente: user.email,
-              archivo_url: archivoURL || "Sin archivo adjunto",
+              archivo_url: archivos.length > 0 ? archivos.map((archivo) => archivo.url).join("\n") : "Sin archivos adjuntos",
               fecha: new Date().toLocaleString("es-CL"),
             });
           }
@@ -736,7 +790,7 @@
         const tbody = document.getElementById("leaderboardBody");
         if (!tbody) return;
         try {
-          const q = query(collection(db, "reportes"), orderBy("fecha", "desc"), limit(10));
+          const q = query(collection(db, "reportes"), where("estado", "==", "aprobado"));
           const snap = await getDocs(q);
 
           if (snap.empty) {
@@ -744,9 +798,20 @@
             return;
           }
 
-          tbody.innerHTML = "";
+          let reportesAprobados = [];
           snap.forEach((docSnap) => {
-            const r = docSnap.data();
+            reportesAprobados.push(docSnap.data());
+          });
+
+          // se ordenan aqui para no pedir otro indice en firebase
+          reportesAprobados.sort((a, b) => {
+            const fechaA = a.fecha && a.fecha.toMillis ? a.fecha.toMillis() : 0;
+            const fechaB = b.fecha && b.fecha.toMillis ? b.fecha.toMillis() : 0;
+            return fechaB - fechaA;
+          });
+
+          tbody.innerHTML = "";
+          reportesAprobados.slice(0, 10).forEach((r) => {
             const nombreMostrado = r.anonimo
               ? '<span class="medallaanonimo">Anónimo</span>'
               : escapeHTML(r.autorNombre || "Usuario") + (r.autorUsername ? ` <span class="nombreautor">(${escapeHTML(r.autorUsername)})</span>` : "");
@@ -789,7 +854,17 @@
           snap.forEach((docSnap) => {
             const r = docSnap.data();
             const fechaTexto = r.fecha && r.fecha.toDate ? r.fecha.toDate().toLocaleString("es-CL") : "—";
-            const archivoHTML = r.archivoURL ? `<a class="enlacearchivo" href="${r.archivoURL}" target="_blank" rel="noopener">Ver archivo adjunto</a>` : "";
+            let archivoHTML = "";
+
+            // los reportes nuevos pueden tener varios archivos
+            if (r.archivos && r.archivos.length > 0) {
+              r.archivos.forEach((archivo, posicion) => {
+                archivoHTML += `<a class="enlacearchivo" href="${archivo.url}" target="_blank" rel="noopener">Ver archivo ${posicion + 1}</a><br>`;
+              });
+            } else if (r.archivoURL) {
+              // esto deja funcionando los reportes que ya estaban guardados
+              archivoHTML = `<a class="enlacearchivo" href="${r.archivoURL}" target="_blank" rel="noopener">Ver archivo adjunto</a>`;
+            }
             const anonimoTexto = r.anonimo ? '<span class="medallaanonimo">Publicado como anónimo</span>' : "";
 
             const card = document.createElement("div");
