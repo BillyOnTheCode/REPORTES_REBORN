@@ -428,7 +428,8 @@ body {
 }
 
 .grupodeinputs input,
-.grupodeinputs textarea {
+.grupodeinputs textarea,
+.grupodeinputs select {
     background: #0d1117;
     border: 1px solid #30363d;
     color: #fff;
@@ -800,7 +801,8 @@ body.light-theme .tarjetamireporte {
 }
 
 body.light-theme .grupodeinputs input, 
-body.light-theme .grupodeinputs textarea {
+body.light-theme .grupodeinputs textarea,
+body.light-theme .grupodeinputs select {
     background: #f7eeda;
     color: #0f172a;
     border: 1px solid #cbd5e1;

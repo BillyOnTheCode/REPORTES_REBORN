@@ -292,6 +292,19 @@
                   required
                 />
               </div>
+              <!-- aqui el usuario dice de que trata el problema -->
+              <div class="grupodeinputs">
+                <label>TIPO DE PROBLEMA</label>
+                <select id="reporteCategoria" required>
+                  <option value="">Selecciona una categoria</option>
+                  <option value="material">Material institucional</option>
+                  <option value="infraestructura">Infraestructura</option>
+                  <option value="convivencia">Convivencia escolar</option>
+                  <option value="bullying">Bullying</option>
+                  <option value="acoso">Acoso</option>
+                  <option value="otro">Otro</option>
+                </select>
+              </div>
               <div class="grupodeinputs">
                 <label>DESCRIPCIÓN DEL REPORTE</label>
                 <textarea
@@ -660,13 +673,14 @@
         }
 
         const titulo = document.getElementById("reporteTitulo").value.trim();
+        const categoria = document.getElementById("reporteCategoria").value;
         const descripcion = document.getElementById("reporteDescripcion").value.trim();
         const archivoInput = document.getElementById("reporteArchivo");
         const archivo = archivoInput.files[0] || null;
         const anonimo = document.getElementById("reporteAnonimo").checked;
 
-        if (!titulo || !descripcion) {
-          setReporteMsg("Completa el título y la descripción.", "err");
+        if (!titulo || !categoria || !descripcion) {
+          setReporteMsg("Completa el título, la categoria y la descripción.", "err");
           return;
         }
 
@@ -689,8 +703,10 @@
             archivoURL = await getDownloadURL(rutaArchivo);
           }
 
+          // aqui se guardan los datos principales del reporte
           const nuevoReporte = {
             titulo,
+            categoria,
             descripcion,
             archivoURL,
             archivoNombre,
@@ -701,6 +717,9 @@
             autorCorreo: user.email,
             anonimo,
             destacado: false,
+            // despues el administrador podra cambiar estos dos datos
+            prioridad: "sin_asignar",
+            estado: "pendiente",
             fecha: serverTimestamp(),
           };
           await addDoc(collection(db, "reportes"), nuevoReporte);
