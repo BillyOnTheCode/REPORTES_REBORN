@@ -298,7 +298,6 @@
                 <select id="reporteCategoria" required>
                   <option value="">Selecciona una categoria</option>
                   <option value="material">Material institucional</option>
-                  <option value="infraestructura">Infraestructura</option>
                   <option value="convivencia">Convivencia escolar</option>
                   <option value="bullying">Bullying</option>
                   <option value="acoso">Acoso</option>
@@ -315,8 +314,8 @@
                 ></textarea>
               </div>
               <div class="grupodeinputs">
-                <label>REPORTE (ADJUNTAR ARCHIVO)</label>
-                <input type="file" class="inputdearchivo" id="reporteArchivo" />
+                <label>REPORTE (ADJUNTAR ARCHIVOS)</label>
+                <input type="file" class="inputdearchivo" id="reporteArchivo" multiple />
               </div>
               <div class="filacheckanonimo">
                 <input type="checkbox" id="reporteAnonimo" />
@@ -676,7 +675,7 @@
         const categoria = document.getElementById("reporteCategoria").value;
         const descripcion = document.getElementById("reporteDescripcion").value.trim();
         const archivoInput = document.getElementById("reporteArchivo");
-        const archivo = archivoInput.files[0] || null;
+        const archivosSeleccionados = archivoInput.files;
         const anonimo = document.getElementById("reporteAnonimo").checked;
 
         if (!titulo || !categoria || !descripcion) {
@@ -694,13 +693,19 @@
           const fotoPerfilUrl = perfilSnap.exists() ? perfilSnap.data().fotoPerfilUrl || null : null;
           const usernameElegido = perfilSnap.exists() ? perfilSnap.data().username || null : null;
 
-          let archivoURL = null;
-          let archivoNombre = null;
-          if (archivo) {
-            archivoNombre = archivo.name;
-            const rutaArchivo = ref(storage, `reportes/${user.uid}/${Date.now()}_${archivo.name}`);
+          let archivos = [];
+
+          // aqui se sube cada archivo que selecciono el usuario
+          for (let i = 0; i < archivosSeleccionados.length; i++) {
+            const archivo = archivosSeleccionados[i];
+            const rutaArchivo = ref(storage, `reportes/${user.uid}/${Date.now()}_${i}_${archivo.name}`);
             await uploadBytes(rutaArchivo, archivo);
-            archivoURL = await getDownloadURL(rutaArchivo);
+            const urlArchivo = await getDownloadURL(rutaArchivo);
+
+            archivos.push({
+              nombre: archivo.name,
+              url: urlArchivo,
+            });
           }
 
           // aqui se guardan los datos principales del reporte
@@ -708,8 +713,7 @@
             titulo,
             categoria,
             descripcion,
-            archivoURL,
-            archivoNombre,
+            archivos,
             autorUID: user.uid,
             autorNombre: nombreReal,
             autorUsername: usernameElegido,
@@ -730,7 +734,7 @@
               descripcion,
               nombre_remitente: nombreReal,
               correo_remitente: user.email,
-              archivo_url: archivoURL || "Sin archivo adjunto",
+              archivo_url: archivos.length > 0 ? archivos.map((archivo) => archivo.url).join("\n") : "Sin archivos adjuntos",
               fecha: new Date().toLocaleString("es-CL"),
             });
           }
@@ -808,7 +812,17 @@
           snap.forEach((docSnap) => {
             const r = docSnap.data();
             const fechaTexto = r.fecha && r.fecha.toDate ? r.fecha.toDate().toLocaleString("es-CL") : "—";
-            const archivoHTML = r.archivoURL ? `<a class="enlacearchivo" href="${r.archivoURL}" target="_blank" rel="noopener">Ver archivo adjunto</a>` : "";
+            let archivoHTML = "";
+
+            // los reportes nuevos pueden tener varios archivos
+            if (r.archivos && r.archivos.length > 0) {
+              r.archivos.forEach((archivo, posicion) => {
+                archivoHTML += `<a class="enlacearchivo" href="${archivo.url}" target="_blank" rel="noopener">Ver archivo ${posicion + 1}</a><br>`;
+              });
+            } else if (r.archivoURL) {
+              // esto deja funcionando los reportes que ya estaban guardados
+              archivoHTML = `<a class="enlacearchivo" href="${r.archivoURL}" target="_blank" rel="noopener">Ver archivo adjunto</a>`;
+            }
             const anonimoTexto = r.anonimo ? '<span class="medallaanonimo">Publicado como anónimo</span>' : "";
 
             const card = document.createElement("div");
