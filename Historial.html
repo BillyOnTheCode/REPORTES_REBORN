@@ -81,6 +81,8 @@
       } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
       import {
         getFirestore,
+        doc,
+        getDoc,
         collection,
         getDocs,
         query,
@@ -224,11 +226,41 @@
           </div>
         `;
 
+        // si tiene miniatura se coloca sin quitar el diseño amarillo
+        if (reporte.miniatura) {
+          ponerMiniatura(tarjeta, reporte.miniatura);
+        } else if (reporte.cantidadImagenes > 0) {
+          // esto permite que los reportes anteriores tambien tengan una miniatura
+          cargarMiniaturaAnterior(reporte.id, tarjeta);
+        }
+
         tarjeta.querySelector(".botonverreporte").addEventListener("click", () => {
           abrirDetalle(reporte);
         });
 
         return tarjeta;
+      }
+
+      function ponerMiniatura(tarjeta, datosImagen) {
+        const portada = tarjeta.querySelector(".portadareporte");
+        const miniatura = document.createElement("img");
+        portada.classList.add("conminiatura");
+        miniatura.src = datosImagen;
+        miniatura.alt = "Miniatura del reporte";
+        portada.appendChild(miniatura);
+      }
+
+      async function cargarMiniaturaAnterior(reporteId, tarjeta) {
+        try {
+          // solo se busca la primera imagen de los reportes que no tenian miniatura
+          const imagenDoc = await getDoc(doc(db, "reportes", reporteId, "imagenes", "imagen_0"));
+
+          if (imagenDoc.exists()) {
+            ponerMiniatura(tarjeta, imagenDoc.data().datos);
+          }
+        } catch (error) {
+          console.error("No se pudo cargar la miniatura anterior:", error);
+        }
       }
 
       // aqui se pone toda la informacion dentro de la ventana
@@ -249,10 +281,26 @@
         document.body.style.overflow = "hidden";
       }
 
-      function mostrarArchivos(reporte) {
+      async function mostrarArchivos(reporte) {
         const contenedor = document.getElementById("detalleArchivos");
-        contenedor.innerHTML = "";
+        contenedor.innerHTML = '<p class="sinarchivos">Buscando imagenes...</p>';
         let archivos = reporte.archivos || [];
+        let imagenes = [];
+
+        try {
+          // las imagenes solo se leen cuando alguien abre el reporte
+          if (reporte.cantidadImagenes > 0) {
+            const resultadoImagenes = await getDocs(collection(db, "reportes", reporte.id, "imagenes"));
+            resultadoImagenes.forEach((imagenDoc) => {
+              imagenes.push(imagenDoc.data());
+            });
+            imagenes.sort((a, b) => (a.posicion || 0) - (b.posicion || 0));
+          }
+        } catch (error) {
+          console.error(error);
+        }
+
+        contenedor.innerHTML = "";
 
         // esto es para los reportes viejos que tenian un solo archivo
         if (archivos.length === 0 && reporte.archivoURL) {
@@ -262,14 +310,22 @@
           });
         }
 
-        if (archivos.length === 0) {
-          contenedor.innerHTML = '<p class="sinarchivos">Este reporte no tiene archivos adjuntos.</p>';
+        if (archivos.length === 0 && imagenes.length === 0) {
+          contenedor.innerHTML = '<p class="sinarchivos">Este reporte no tiene imagenes adjuntas.</p>';
           return;
         }
 
         const tituloArchivos = document.createElement("h3");
-        tituloArchivos.innerText = "ARCHIVOS ADJUNTOS";
+        tituloArchivos.innerText = "IMAGENES DEL REPORTE";
         contenedor.appendChild(tituloArchivos);
+
+        imagenes.forEach((imagen, posicion) => {
+          const vista = document.createElement("img");
+          vista.className = "imagendetalle";
+          vista.src = imagen.datos;
+          vista.alt = imagen.nombre || `Imagen ${posicion + 1} del reporte`;
+          contenedor.appendChild(vista);
+        });
 
         archivos.forEach((archivo, posicion) => {
           const enlace = document.createElement("a");

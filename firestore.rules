@@ -31,6 +31,22 @@ service cloud.firestore {
       return correo.lower().matches('.*@sip\\.cl$') ? 'profesor' : 'alumno';
     }
 
+    function puedeVerImagen(reporteId) {
+      let reporte = get(/databases/$(database)/documents/reportes/$(reporteId));
+      return esInspector() || (
+        tieneSesion() && (
+          reporte.data.estado == 'aprobado' ||
+          reporte.data.autorUID == request.auth.uid
+        )
+      );
+    }
+
+    function imagenPerfilValida(valor, pesoMaximo) {
+      return valor is string &&
+        valor.size() <= pesoMaximo &&
+        (valor == '' || valor.matches('data:image/jpeg;base64,.*'));
+    }
+
     match /usuarios/{usuarioId} {
       // cada usuario puede crear solamente su propio perfil
       allow create: if tieneSesion() &&
@@ -81,6 +97,21 @@ service cloud.firestore {
       }
     }
 
+    match /perfilesImagenes/{usuarioId} {
+      // estas imagenes estan separadas para no pesar en la lista de cuentas
+      allow read: if tieneSesion() && (
+        request.auth.uid == usuarioId || esInspector()
+      );
+
+      allow create, update: if tieneSesion() &&
+        request.auth.uid == usuarioId &&
+        request.resource.data.keys().hasOnly(['avatar', 'banner']) &&
+        imagenPerfilValida(request.resource.data.avatar, 65000) &&
+        imagenPerfilValida(request.resource.data.banner, 120000);
+
+      allow delete: if tieneSesion() && request.auth.uid == usuarioId;
+    }
+
     match /reportes/{reporteId} {
       // un alumno puede ver los aprobados y tambien sus propios reportes
       allow read: if esInspector() || (
@@ -94,22 +125,83 @@ service cloud.firestore {
       allow create: if tieneSesion() &&
         request.resource.data.autorUID == request.auth.uid &&
         request.resource.data.estado == 'pendiente' &&
-        request.resource.data.prioridad == 'sin_asignar';
+        request.resource.data.prioridad == 'sin_asignar' &&
+        request.resource.data.get('cantidadImagenes', 0) >= 0 &&
+        request.resource.data.get('cantidadImagenes', 0) <= 3 &&
+        request.resource.data.get('miniatura', '') is string &&
+        request.resource.data.get('miniatura', '').size() <= 50000 &&
+        (
+          request.resource.data.get('miniatura', '') == '' ||
+          request.resource.data.get('miniatura', '').matches('data:image/jpeg;base64,.*')
+        ) &&
+        (
+          (
+            request.resource.data.anonimo == true &&
+            request.resource.data.autorFotoUrl == null
+          ) ||
+          (
+            request.resource.data.anonimo == false &&
+            (
+              request.resource.data.autorFotoUrl == null ||
+              imagenPerfilValida(request.resource.data.autorFotoUrl, 65000)
+            )
+          )
+        );
 
       // los inspectores solo cambian los datos de la revision
-      allow update: if esInspector() &&
-        resource.data.get('estado', 'pendiente') == 'pendiente' &&
-        request.resource.data.estado in ['aprobado', 'descartado'] &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'categoria',
-          'prioridad',
-          'estado',
-          'revisadoPor',
-          'revisadoCorreo',
-          'revisadoEn'
-        ]);
+      allow update: if (
+        esInspector() &&
+          resource.data.get('estado', 'pendiente') == 'pendiente' &&
+          request.resource.data.estado in ['aprobado', 'descartado'] &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'categoria',
+            'prioridad',
+            'estado',
+            'revisadoPor',
+            'revisadoCorreo',
+            'revisadoEn'
+          ])
+        ) || (
+          tieneSesion() &&
+          resource.data.autorUID == request.auth.uid &&
+          resource.data.anonimo == false &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['autorFotoUrl']) &&
+          imagenPerfilValida(request.resource.data.autorFotoUrl, 65000)
+        );
 
-      allow delete: if false;
+      // los inspectores pueden limpiar reportes de prueba o que ya no sirven
+      allow delete: if esInspector();
+
+      match /imagenes/{imagenId} {
+        // el autor y los inspectores pueden verlas, despues de aprobar todos pueden
+        allow read: if puedeVerImagen(reporteId);
+
+        // los nombres fijos evitan que alguien guarde mas de tres imagenes
+        allow create: if tieneSesion() &&
+          imagenId in ['imagen_0', 'imagen_1', 'imagen_2'] &&
+          get(/databases/$(database)/documents/reportes/$(reporteId)).data.autorUID == request.auth.uid &&
+          get(/databases/$(database)/documents/reportes/$(reporteId)).data.estado == 'pendiente' &&
+          request.resource.data.keys().hasOnly([
+            'nombre',
+            'tipo',
+            'datos',
+            'posicion',
+            'autorUID'
+          ]) &&
+          request.resource.data.autorUID == request.auth.uid &&
+          request.resource.data.tipo == 'image/jpeg' &&
+          request.resource.data.datos is string &&
+          request.resource.data.datos.matches('data:image/jpeg;base64,.*') &&
+          request.resource.data.datos.size() <= 230000 &&
+          request.resource.data.nombre is string &&
+          request.resource.data.nombre.size() <= 120 &&
+          request.resource.data.posicion is int &&
+          request.resource.data.posicion >= 0 &&
+          request.resource.data.posicion <= 2;
+
+        allow update: if false;
+        allow delete: if esInspector();
+      }
     }
   }
 }

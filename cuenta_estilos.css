@@ -86,6 +86,85 @@
     padding: 24px;
 }
 
+.perfil-visual {
+    position: relative;
+    margin: -24px -24px 75px;
+}
+
+.banner-perfil {
+    height: 185px;
+    border-bottom: 3px solid var(--gold, #ffcc00);
+    border-radius: 8px 8px 0 0;
+    background:
+        linear-gradient(130deg, rgba(255, 204, 0, 0.88), rgba(255, 145, 0, 0.45)),
+        repeating-linear-gradient(45deg, #111 0, #111 10px, #252525 10px, #252525 20px);
+    background-position: center;
+    background-size: cover;
+    overflow: hidden;
+}
+
+.banner-perfil span {
+    display: inline-block;
+    margin: 18px;
+    padding: 7px 10px;
+    background: rgba(0, 0, 0, 0.72);
+    color: var(--gold, #ffcc00);
+    font-size: 0.72rem;
+    font-weight: bold;
+}
+
+.banner-perfil.con-imagen span {
+    display: none;
+}
+
+.icono-perfil {
+    position: absolute;
+    left: 26px;
+    bottom: -57px;
+    width: 114px;
+    height: 114px;
+    padding: 5px;
+    border: 3px solid var(--gold, #ffcc00);
+    border-radius: 50%;
+    background: #161b22;
+}
+
+.icono-perfil img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #343943;
+}
+
+.icono-perfil img[src$="acclogo.png"] {
+    padding: 18px;
+    box-sizing: border-box;
+    filter: grayscale(1);
+    opacity: 0.7;
+}
+
+.controles-imagenes-perfil {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 28px;
+}
+
+.controles-imagenes-perfil label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    color: var(--gold, #ffcc00);
+    font-size: 0.72rem;
+    font-weight: bold;
+}
+
+.controles-imagenes-perfil .inputdearchivo {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 .grilla-perfil {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -107,4 +186,14 @@ header img {
     max-height: 180px;
     border-radius: 6px;
     object-fit: cover;
+}
+
+@media (max-width: 650px) {
+    .banner-perfil {
+        height: 145px;
+    }
+
+    .controles-imagenes-perfil {
+        grid-template-columns: 1fr;
+    }
 }

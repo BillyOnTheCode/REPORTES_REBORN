@@ -92,7 +92,9 @@
 .botonaprobar,
 .botondescartar,
 .botonponerrol,
-.botonquitarrol {
+.botonquitarrol,
+.botoneliminar,
+.botonverimagenes {
     padding: 10px 15px;
     border-radius: 3px;
     font-family: 'Montserrat', sans-serif;
@@ -110,7 +112,8 @@
 }
 
 .botondescartar,
-.botonquitarrol {
+.botonquitarrol,
+.botoneliminar {
     border: 1px solid #ff5b5b;
     background: transparent;
     color: #ff6b6b;
@@ -123,6 +126,18 @@
 .botonquitarrol:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.botoneliminar:disabled,
+.botonverimagenes:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.botonverimagenes {
+    border: 1px solid var(--gold);
+    background: transparent;
+    color: var(--gold);
 }
 
 .listareportesinspector {
@@ -181,6 +196,40 @@
 .archivosadmin a {
     color: var(--gold);
     font-size: 0.78rem;
+}
+
+.imagenadmin {
+    width: min(100%, 420px);
+    max-height: 320px;
+    border: 1px solid #3a3d46;
+    border-radius: 4px;
+    object-fit: contain;
+    background: #080a0e;
+}
+
+.estadoadmin {
+    height: fit-content;
+    padding: 6px 9px;
+    border: 1px solid #777;
+    color: #bbb;
+    font-size: 0.65rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.estado-aprobado {
+    border-color: #4caf50;
+    color: #6edb73;
+}
+
+.estado-descartado {
+    border-color: #ff5b5b;
+    color: #ff6b6b;
+}
+
+.estado-pendiente {
+    border-color: var(--gold);
+    color: var(--gold);
 }
 
 .sinarchivosadmin {
