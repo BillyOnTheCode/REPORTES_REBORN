@@ -690,6 +690,15 @@ body {
     border: 1px solid var(--gold, #ffcc00);
 }
 
+.avatargris,
+.tabladelideres td img.avatargris {
+    padding: 5px;
+    border-color: #777 !important;
+    background: #343943;
+    filter: grayscale(1);
+    opacity: 0.72;
+}
+
 /* En caso de que se adjunte una imagen en la celda de Título o Contenido */
 .tabladelideres td img:not(.avatarautor) {
     max-width: 120px;

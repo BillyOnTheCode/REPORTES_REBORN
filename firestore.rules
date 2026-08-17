@@ -41,6 +41,12 @@ service cloud.firestore {
       );
     }
 
+    function imagenPerfilValida(valor, pesoMaximo) {
+      return valor is string &&
+        valor.size() <= pesoMaximo &&
+        (valor == '' || valor.matches('data:image/jpeg;base64,.*'));
+    }
+
     match /usuarios/{usuarioId} {
       // cada usuario puede crear solamente su propio perfil
       allow create: if tieneSesion() &&
@@ -91,6 +97,21 @@ service cloud.firestore {
       }
     }
 
+    match /perfilesImagenes/{usuarioId} {
+      // estas imagenes estan separadas para no pesar en la lista de cuentas
+      allow read: if tieneSesion() && (
+        request.auth.uid == usuarioId || esInspector()
+      );
+
+      allow create, update: if tieneSesion() &&
+        request.auth.uid == usuarioId &&
+        request.resource.data.keys().hasOnly(['avatar', 'banner']) &&
+        imagenPerfilValida(request.resource.data.avatar, 65000) &&
+        imagenPerfilValida(request.resource.data.banner, 120000);
+
+      allow delete: if tieneSesion() && request.auth.uid == usuarioId;
+    }
+
     match /reportes/{reporteId} {
       // un alumno puede ver los aprobados y tambien sus propios reportes
       allow read: if esInspector() || (
@@ -112,20 +133,41 @@ service cloud.firestore {
         (
           request.resource.data.get('miniatura', '') == '' ||
           request.resource.data.get('miniatura', '').matches('data:image/jpeg;base64,.*')
+        ) &&
+        (
+          (
+            request.resource.data.anonimo == true &&
+            request.resource.data.autorFotoUrl == null
+          ) ||
+          (
+            request.resource.data.anonimo == false &&
+            (
+              request.resource.data.autorFotoUrl == null ||
+              imagenPerfilValida(request.resource.data.autorFotoUrl, 65000)
+            )
+          )
         );
 
       // los inspectores solo cambian los datos de la revision
-      allow update: if esInspector() &&
-        resource.data.get('estado', 'pendiente') == 'pendiente' &&
-        request.resource.data.estado in ['aprobado', 'descartado'] &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'categoria',
-          'prioridad',
-          'estado',
-          'revisadoPor',
-          'revisadoCorreo',
-          'revisadoEn'
-        ]);
+      allow update: if (
+        esInspector() &&
+          resource.data.get('estado', 'pendiente') == 'pendiente' &&
+          request.resource.data.estado in ['aprobado', 'descartado'] &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'categoria',
+            'prioridad',
+            'estado',
+            'revisadoPor',
+            'revisadoCorreo',
+            'revisadoEn'
+          ])
+        ) || (
+          tieneSesion() &&
+          resource.data.autorUID == request.auth.uid &&
+          resource.data.anonimo == false &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['autorFotoUrl']) &&
+          imagenPerfilValida(request.resource.data.autorFotoUrl, 65000)
+        );
 
       // los inspectores pueden limpiar reportes de prueba o que ya no sirven
       allow delete: if esInspector();
