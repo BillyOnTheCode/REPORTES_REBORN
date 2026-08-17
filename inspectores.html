@@ -45,6 +45,7 @@
 
       <nav class="pestanasinspector">
         <button id="tabReportes" class="pestanainspector activa">REPORTES PENDIENTES</button>
+        <button id="tabManager" class="pestanainspector">MANAGER DE REPORTES</button>
         <button id="tabCuentas" class="pestanainspector">ADMINISTRAR INSPECTORES</button>
       </nav>
 
@@ -61,6 +62,22 @@
         </p>
         <div id="listaReportesPendientes" class="listareportesinspector">
           <p class="mensajeadmin">Cargando reportes pendientes...</p>
+        </div>
+      </section>
+
+      <section id="seccionManager" class="seccioninspector">
+        <div class="encabezadoseccion">
+          <div>
+            <p>// ADMINISTRACION</p>
+            <h2>TODOS LOS REPORTES</h2>
+          </div>
+          <button id="actualizarManager" class="botonactualizar">ACTUALIZAR</button>
+        </div>
+        <p class="explicacionseccion">
+          Aqui puedes revisar el estado de los reportes y eliminar los que ya no se necesiten.
+        </p>
+        <div id="listaTodosReportes" class="listareportesinspector">
+          <p class="mensajeadmin">Entra a esta pestaña para cargar los reportes.</p>
         </div>
       </section>
 
@@ -95,6 +112,7 @@
         query,
         where,
         updateDoc,
+        deleteDoc,
         serverTimestamp,
       } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -114,6 +132,7 @@
 
       const guardLoadingScreen = document.getElementById("guard-loading-screen");
       const listaReportes = document.getElementById("listaReportesPendientes");
+      const listaTodosReportes = document.getElementById("listaTodosReportes");
       const listaCuentas = document.getElementById("listaCuentas");
       let usuarioActual = null;
       let rolActual = "";
@@ -170,15 +189,25 @@
         cambiarPestana("cuentas");
       });
 
+      document.getElementById("tabManager").addEventListener("click", () => {
+        cambiarPestana("manager");
+        cargarTodosReportes();
+      });
+
       function cambiarPestana(nombre) {
         const mostrarReportes = nombre === "reportes";
+        const mostrarManager = nombre === "manager";
+        const mostrarCuentas = nombre === "cuentas";
         document.getElementById("tabReportes").classList.toggle("activa", mostrarReportes);
-        document.getElementById("tabCuentas").classList.toggle("activa", !mostrarReportes);
+        document.getElementById("tabManager").classList.toggle("activa", mostrarManager);
+        document.getElementById("tabCuentas").classList.toggle("activa", mostrarCuentas);
         document.getElementById("seccionReportes").classList.toggle("activa", mostrarReportes);
-        document.getElementById("seccionCuentas").classList.toggle("activa", !mostrarReportes);
+        document.getElementById("seccionManager").classList.toggle("activa", mostrarManager);
+        document.getElementById("seccionCuentas").classList.toggle("activa", mostrarCuentas);
       }
 
       document.getElementById("actualizarReportes").addEventListener("click", cargarReportesPendientes);
+      document.getElementById("actualizarManager").addEventListener("click", cargarTodosReportes);
       document.getElementById("actualizarCuentas").addEventListener("click", cargarCuentas);
 
       // aqui se buscan los reportes que todavia no han sido revisados
@@ -319,6 +348,101 @@
         }
       }
 
+      // esta parte carga todos los reportes solamente cuando se abre el manager
+      async function cargarTodosReportes() {
+        listaTodosReportes.innerHTML = '<p class="mensajeadmin">Cargando todos los reportes...</p>';
+
+        try {
+          const resultado = await getDocs(collection(db, "reportes"));
+          let reportes = [];
+
+          resultado.forEach((reporteDoc) => {
+            reportes.push({
+              id: reporteDoc.id,
+              ...reporteDoc.data(),
+            });
+          });
+
+          reportes.sort((a, b) => obtenerTiempo(b.fecha) - obtenerTiempo(a.fecha));
+
+          if (reportes.length === 0) {
+            listaTodosReportes.innerHTML = '<p class="mensajeadmin">No hay reportes guardados.</p>';
+            return;
+          }
+
+          listaTodosReportes.innerHTML = "";
+          reportes.forEach((reporte) => {
+            listaTodosReportes.appendChild(crearReporteManager(reporte));
+          });
+        } catch (error) {
+          console.error(error);
+          listaTodosReportes.innerHTML = '<p class="mensajeadmin errormensaje">No se pudieron cargar los reportes.</p>';
+        }
+      }
+
+      function crearReporteManager(reporte) {
+        const tarjeta = document.createElement("article");
+        tarjeta.className = "reporteadministracion";
+        const estado = reporte.estado || "pendiente";
+
+        tarjeta.innerHTML = `
+          <div class="cabecerareporteadmin">
+            <div>
+              <span class="categoriaadmin">${escapeHTML(nombreCategoria(reporte.categoria))}</span>
+              <h3>${escapeHTML(reporte.titulo || "Reporte sin titulo")}</h3>
+            </div>
+            <span class="estadoadmin estado-${escapeHTML(estado)}">${escapeHTML(estado)}</span>
+          </div>
+          <p class="autoradmin"><strong>Enviado por:</strong> ${escapeHTML(reporte.autorCorreo || "sin correo")}</p>
+          <p class="descripcionadmin">${escapeHTML(reporte.descripcion || "Sin descripcion")}</p>
+          <div class="archivosadmin"></div>
+          <div class="accionesreporte">
+            <button class="botoneliminar">ELIMINAR REPORTE</button>
+          </div>
+          <p class="mensajetarjeta"></p>
+        `;
+
+        mostrarArchivos(reporte, tarjeta.querySelector(".archivosadmin"));
+
+        tarjeta.querySelector(".botoneliminar").addEventListener("click", () => {
+          eliminarReporte(reporte, tarjeta);
+        });
+
+        return tarjeta;
+      }
+
+      async function eliminarReporte(reporte, tarjeta) {
+        const mensaje = tarjeta.querySelector(".mensajetarjeta");
+
+        if (!confirm(`¿Seguro que quieres eliminar el reporte "${reporte.titulo || "Sin titulo"}"? Tambien se borraran sus imagenes.`)) {
+          return;
+        }
+
+        tarjeta.querySelectorAll("button").forEach((boton) => boton.disabled = true);
+        mensaje.innerText = "Eliminando reporte...";
+
+        try {
+          // primero se borran las imagenes y despues el reporte
+          const imagenes = await getDocs(collection(db, "reportes", reporte.id, "imagenes"));
+
+          for (const imagenDoc of imagenes.docs) {
+            await deleteDoc(imagenDoc.ref);
+          }
+
+          await deleteDoc(doc(db, "reportes", reporte.id));
+          tarjeta.remove();
+
+          if (!listaTodosReportes.querySelector(".reporteadministracion")) {
+            listaTodosReportes.innerHTML = '<p class="mensajeadmin">No hay reportes guardados.</p>';
+          }
+        } catch (error) {
+          console.error(error);
+          mensaje.innerText = "No se pudo eliminar el reporte.";
+          mensaje.className = "mensajetarjeta errormensaje";
+          tarjeta.querySelectorAll("button").forEach((boton) => boton.disabled = false);
+        }
+      }
+
       // aqui se cargan las cuentas para poder elegir inspectores
       async function cargarCuentas() {
         listaCuentas.innerHTML = '<p class="mensajeadmin">Cargando cuentas...</p>';
@@ -431,7 +555,7 @@
       }
 
       function mostrarArchivos(reporte, contenedor) {
-        let archivos = reporte.archivos || [];
+        let archivos = [...(reporte.archivos || [])];
 
         if (archivos.length === 0 && reporte.archivoURL) {
           archivos.push({
@@ -440,7 +564,7 @@
           });
         }
 
-        if (archivos.length === 0) {
+        if (archivos.length === 0 && !reporte.cantidadImagenes) {
           contenedor.innerHTML = '<span class="sinarchivosadmin">Sin archivos adjuntos</span>';
           return;
         }
@@ -453,6 +577,40 @@
           enlace.innerText = archivo.nombre || `Ver archivo ${posicion + 1}`;
           contenedor.appendChild(enlace);
         });
+
+        if (reporte.cantidadImagenes > 0) {
+          const boton = document.createElement("button");
+          boton.className = "botonverimagenes";
+          boton.innerText = `VER IMAGENES (${reporte.cantidadImagenes})`;
+          boton.addEventListener("click", () => cargarImagenesReporte(reporte.id, contenedor, boton));
+          contenedor.appendChild(boton);
+        }
+      }
+
+      async function cargarImagenesReporte(reporteId, contenedor, boton) {
+        boton.disabled = true;
+        boton.innerText = "CARGANDO IMAGENES...";
+
+        try {
+          const resultado = await getDocs(collection(db, "reportes", reporteId, "imagenes"));
+          let imagenes = [];
+
+          resultado.forEach((imagenDoc) => imagenes.push(imagenDoc.data()));
+          imagenes.sort((a, b) => (a.posicion || 0) - (b.posicion || 0));
+          boton.remove();
+
+          imagenes.forEach((imagen, posicion) => {
+            const vista = document.createElement("img");
+            vista.className = "imagenadmin";
+            vista.src = imagen.datos;
+            vista.alt = imagen.nombre || `Imagen ${posicion + 1}`;
+            contenedor.appendChild(vista);
+          });
+        } catch (error) {
+          console.error(error);
+          boton.disabled = false;
+          boton.innerText = "NO SE PUDIERON CARGAR";
+        }
       }
 
       function actualizarTextoPermisos() {

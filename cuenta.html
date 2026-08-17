@@ -64,6 +64,26 @@
         <!-- SECCIÓN 1: PERFIL DE USUARIO -->
         <section id="seccion-perfil" class="seccion-tab activo">
             <div class="tarjeta-perfil">
+                <div class="perfil-visual">
+                    <div class="banner-perfil" id="accBannerPreview">
+                        <span>// BANNER DE PERFIL</span>
+                    </div>
+                    <div class="icono-perfil">
+                        <img id="accAvatarPreview" src="Archivos/imagen/acclogo.png" alt="Icono del perfil" />
+                    </div>
+                </div>
+
+                <div class="controles-imagenes-perfil">
+                    <label>
+                        ICONO
+                        <input type="file" class="inputdearchivo" id="accAvatarArchivo" accept="image/jpeg,image/png,image/webp" />
+                    </label>
+                    <label>
+                        BANNER
+                        <input type="file" class="inputdearchivo" id="accBannerArchivo" accept="image/jpeg,image/png,image/webp" />
+                    </label>
+                </div>
+
                 <h2 style="color: var(--gold); margin-top: 0;">INFORMACIÓN PERSONAL</h2>
                 <form class="formulariocustom" id="form-actualizar-perfil">
                     <div class="grilla-perfil">
@@ -147,7 +167,12 @@
         getFirestore, 
         doc, 
         getDoc, 
-        updateDoc 
+        updateDoc,
+        setDoc,
+        collection,
+        query,
+        where,
+        getDocs
       } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
       const firebaseConfig = {
@@ -164,6 +189,96 @@
       const db = getFirestore(app);
 
       const guardLoadingScreen = document.getElementById("guard-loading-screen");
+      let avatarActual = "";
+      let bannerActual = "";
+      let avatarPendiente = null;
+      let bannerPendiente = null;
+
+      // aqui se recorta la imagen para que no se guarde tan pesada
+      function prepararImagen(archivo, ancho, alto, calidad, pesoMaximo) {
+        return new Promise((resolve, reject) => {
+          const tiposPermitidos = ["image/jpeg", "image/png", "image/webp"];
+
+          if (!tiposPermitidos.includes(archivo.type)) {
+            reject(new Error("Solo se permiten imagenes JPG, PNG o WEBP."));
+            return;
+          }
+
+          const lector = new FileReader();
+
+          lector.onload = () => {
+            const imagen = new Image();
+
+            imagen.onload = () => {
+              const lienzo = document.createElement("canvas");
+              lienzo.width = ancho;
+              lienzo.height = alto;
+              const dibujo = lienzo.getContext("2d");
+              const escala = Math.max(ancho / imagen.width, alto / imagen.height);
+              const anchoDibujo = imagen.width * escala;
+              const altoDibujo = imagen.height * escala;
+              const posicionX = (ancho - anchoDibujo) / 2;
+              const posicionY = (alto - altoDibujo) / 2;
+
+              dibujo.fillStyle = "#11131a";
+              dibujo.fillRect(0, 0, ancho, alto);
+              dibujo.drawImage(imagen, posicionX, posicionY, anchoDibujo, altoDibujo);
+
+              let datos = lienzo.toDataURL("image/jpeg", calidad);
+
+              if (new Blob([datos]).size > pesoMaximo) {
+                datos = lienzo.toDataURL("image/jpeg", 0.3);
+              }
+
+              if (new Blob([datos]).size > pesoMaximo) {
+                reject(new Error("La imagen sigue pesando demasiado."));
+                return;
+              }
+
+              resolve(datos);
+            };
+
+            imagen.onerror = () => reject(new Error("No se pudo leer la imagen."));
+            imagen.src = lector.result;
+          };
+
+          lector.onerror = () => reject(new Error("No se pudo leer la imagen."));
+          lector.readAsDataURL(archivo);
+        });
+      }
+
+      function mostrarBanner(datos) {
+        const banner = document.getElementById("accBannerPreview");
+
+        if (datos) {
+          banner.style.backgroundImage = `url("${datos}")`;
+          banner.classList.add("con-imagen");
+        }
+      }
+
+      document.getElementById("accAvatarArchivo").addEventListener("change", async (evento) => {
+        const archivo = evento.target.files[0];
+        if (!archivo) return;
+
+        try {
+          avatarPendiente = await prepararImagen(archivo, 260, 260, 0.55, 65000);
+          document.getElementById("accAvatarPreview").src = avatarPendiente;
+        } catch (error) {
+          document.getElementById("accMsgPerfil").innerText = error.message;
+        }
+      });
+
+      document.getElementById("accBannerArchivo").addEventListener("change", async (evento) => {
+        const archivo = evento.target.files[0];
+        if (!archivo) return;
+
+        try {
+          bannerPendiente = await prepararImagen(archivo, 1000, 300, 0.45, 120000);
+          mostrarBanner(bannerPendiente);
+        } catch (error) {
+          document.getElementById("accMsgPerfil").innerText = error.message;
+        }
+      });
 
       // Cargar datos del perfil
       onAuthStateChanged(auth, async (user) => {
@@ -174,6 +289,7 @@
 
         try {
           const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+
           if (userDoc.exists()) {
             const data = userDoc.data();
             document.getElementById("accNombre").value = data.nombreReal || "No registrado";
@@ -181,6 +297,24 @@
             document.getElementById("accCorreo").value = data.correo || user.email;
             document.getElementById("accUsername").value = data.username || "";
             document.getElementById("accBio").value = data.bio || "";
+          }
+
+          try {
+            const imagenesDoc = await getDoc(doc(db, "perfilesImagenes", user.uid));
+
+            if (imagenesDoc.exists()) {
+              const imagenes = imagenesDoc.data();
+              avatarActual = imagenes.avatar || "";
+              bannerActual = imagenes.banner || "";
+
+              if (avatarActual) {
+                document.getElementById("accAvatarPreview").src = avatarActual;
+              }
+
+              mostrarBanner(bannerActual);
+            }
+          } catch (errorImagenes) {
+            console.error("Todavia no se pudieron cargar las imagenes:", errorImagenes);
           }
         } catch (err) {
           console.error("Error al obtener perfil:", err);
@@ -201,20 +335,53 @@
         const username = document.getElementById("accUsername").value.trim();
         const bio = document.getElementById("accBio").value.trim();
         const msg = document.getElementById("accMsgPerfil");
+        const boton = document.getElementById("btnGuardarPerfil");
 
+        boton.disabled = true;
         msg.style.color = "#ffcc00";
         msg.innerText = "Guardando...";
 
         try {
+          const avatarFinal = avatarPendiente !== null ? avatarPendiente : avatarActual;
+          const bannerFinal = bannerPendiente !== null ? bannerPendiente : bannerActual;
+
           await updateDoc(doc(db, "usuarios", user.uid), {
             username: username,
             bio: bio
           });
+
+          if (avatarPendiente !== null || bannerPendiente !== null) {
+            await setDoc(doc(db, "perfilesImagenes", user.uid), {
+              avatar: avatarFinal,
+              banner: bannerFinal
+            });
+          }
+
+          if (avatarPendiente !== null) {
+            // tambien cambia el icono de sus reportes que no son anonimos
+            const consulta = query(collection(db, "reportes"), where("autorUID", "==", user.uid));
+            const reportes = await getDocs(consulta);
+
+            for (const reporteDoc of reportes.docs) {
+              if (reporteDoc.data().anonimo === false) {
+                await updateDoc(reporteDoc.ref, {
+                  autorFotoUrl: avatarFinal
+                });
+              }
+            }
+          }
+
+          avatarActual = avatarFinal;
+          bannerActual = bannerFinal;
+          avatarPendiente = null;
+          bannerPendiente = null;
           msg.style.color = "#4caf50";
           msg.innerText = "¡Perfil actualizado con éxito!";
         } catch (err) {
           msg.style.color = "#f44336";
           msg.innerText = "Error al actualizar: " + err.message;
+        } finally {
+          boton.disabled = false;
         }
       });
 

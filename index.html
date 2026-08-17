@@ -9,7 +9,6 @@
     <link rel="icon" href="Archivos/imagen/REPORTES LOGO.png" type="image/png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="auth.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   </head>
   <body>
     <div class="capaoscurapatapar" id="navOverlay"></div>
@@ -317,10 +316,15 @@
                 ></textarea>
               </div>
               <div class="grupodeinputs">
-                <label>REPORTE (ARCHIVOS NO DISPONIBLES POR AHORA)</label>
-                <!-- firebase pide un plan de pago para poder subir archivos -->
-                <input type="file" class="inputdearchivo" id="reporteArchivo" multiple disabled />
-                <span class="archivosdesactivados">Los archivos adjuntos se habilitaran mas adelante.</span>
+                <label>IMAGENES DEL REPORTE (OPCIONAL)</label>
+                <input
+                  type="file"
+                  class="inputdearchivo"
+                  id="reporteArchivo"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                />
+                <span class="limitearchivos">Puedes elegir hasta 3 imagenes. Se reduciran antes de guardarlas.</span>
               </div>
               <div class="filacheckanonimo">
                 <input type="checkbox" id="reporteAnonimo" />
@@ -428,22 +432,10 @@
         serverTimestamp,
         query,
         where,
-        orderBy,
-        limit,
         getDocs,
       } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-      import {
-        getStorage,
-        ref,
-        uploadBytes,
-        getDownloadURL,
-      } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
 
-      const EMAILJS_PUBLIC_KEY = "Fdr9w_UZ6HPs_dxC0";
-      const EMAILJS_SERVICE_ID = "service_u15cewk";
-      const EMAILJS_TEMPLATE_ID = "template_xbxkyjk";
       const CORREO_INSPECTOR_MAYOR = "rodrigo.rojas.arbayza@alumnos.sip.cl";
-      if (window.emailjs) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
       const firebaseConfig = {
         apiKey: "AIzaSyCx6yFD14dDDbt2ClRDzhYIhnGgyuhIW-c",
@@ -457,7 +449,6 @@
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const db = getFirestore(app);
-      const storage = getStorage(app);
 
       const msg = document.getElementById("msg");
       const guardLoadingScreen = document.getElementById("guard-loading-screen");
@@ -595,14 +586,15 @@
         });
       };
 
-      onAuthStateChanged(auth, (user) => {
+      onAuthStateChanged(auth, async (user) => {
         const loginScreen = document.getElementById("pantalla-login");
         const mainContent = document.getElementById("pagina-protegida");
 
         if (user) {
           loginScreen.style.display = "none";
           mainContent.style.display = "block";
-          revisarAccesoInspector(user);
+          // se espera el rol antes de quitar la pantalla de carga
+          await revisarAccesoInspector(user);
         } else {
           loginScreen.style.display = "flex";
           mainContent.style.display = "none";
@@ -695,6 +687,89 @@
         reporteMsg.className = tipo || "";
       }
 
+      // aqui se hace una copia mas pequeña de la imagen
+      function comprimirImagen(archivo, crearMiniatura) {
+        return new Promise((resolve, reject) => {
+          const lector = new FileReader();
+
+          lector.onload = () => {
+            const imagen = new Image();
+
+            imagen.onload = () => {
+              let ancho = imagen.width;
+              let alto = imagen.height;
+              const limite = 900;
+
+              if (ancho > limite || alto > limite) {
+                const proporcion = Math.min(limite / ancho, limite / alto);
+                ancho = Math.round(ancho * proporcion);
+                alto = Math.round(alto * proporcion);
+              }
+
+              const lienzo = document.createElement("canvas");
+              lienzo.width = ancho;
+              lienzo.height = alto;
+              const dibujo = lienzo.getContext("2d");
+
+              // esto evita que una imagen transparente tenga fondo negro
+              dibujo.fillStyle = "#ffffff";
+              dibujo.fillRect(0, 0, ancho, alto);
+              dibujo.drawImage(imagen, 0, 0, ancho, alto);
+
+              let datos = lienzo.toDataURL("image/jpeg", 0.65);
+              let pesoFinal = new Blob([datos]).size;
+
+              // si todavia pesa mucho se intenta una compresion un poco mayor
+              if (pesoFinal > 220 * 1024) {
+                datos = lienzo.toDataURL("image/jpeg", 0.45);
+                pesoFinal = new Blob([datos]).size;
+              }
+
+              if (pesoFinal > 220 * 1024) {
+                reject(new Error("Una imagen sigue pesando demasiado despues de reducirla."));
+                return;
+              }
+
+              let miniatura = "";
+
+              if (crearMiniatura) {
+                const limiteMiniatura = 360;
+                const proporcionMiniatura = Math.min(limiteMiniatura / imagen.width, limiteMiniatura / imagen.height, 1);
+                const miniLienzo = document.createElement("canvas");
+                miniLienzo.width = Math.round(imagen.width * proporcionMiniatura);
+                miniLienzo.height = Math.round(imagen.height * proporcionMiniatura);
+                const miniDibujo = miniLienzo.getContext("2d");
+                miniDibujo.fillStyle = "#ffffff";
+                miniDibujo.fillRect(0, 0, miniLienzo.width, miniLienzo.height);
+                miniDibujo.drawImage(imagen, 0, 0, miniLienzo.width, miniLienzo.height);
+                miniatura = miniLienzo.toDataURL("image/jpeg", 0.45);
+
+                if (new Blob([miniatura]).size > 45000) {
+                  miniatura = miniLienzo.toDataURL("image/jpeg", 0.3);
+                }
+
+                if (new Blob([miniatura]).size > 45000) {
+                  miniatura = "";
+                }
+              }
+
+              resolve({
+                nombre: archivo.name.replace(/\.[^/.]+$/, "") + ".jpg",
+                tipo: "image/jpeg",
+                datos: datos,
+                miniatura: miniatura,
+              });
+            };
+
+            imagen.onerror = () => reject(new Error("No se pudo leer una de las imagenes."));
+            imagen.src = lector.result;
+          };
+
+          lector.onerror = () => reject(new Error("No se pudo leer una de las imagenes."));
+          lector.readAsDataURL(archivo);
+        });
+      }
+
       document.getElementById("btnEnviarReporte").addEventListener("click", async () => {
         const user = auth.currentUser;
         if (!user) {
@@ -714,6 +789,20 @@
           return;
         }
 
+        if (archivosSeleccionados.length > 3) {
+          setReporteMsg("Solo puedes elegir hasta 3 imagenes.", "err");
+          return;
+        }
+
+        for (let i = 0; i < archivosSeleccionados.length; i++) {
+          const tiposPermitidos = ["image/jpeg", "image/png", "image/webp"];
+
+          if (!tiposPermitidos.includes(archivosSeleccionados[i].type)) {
+            setReporteMsg("Solo se permiten imagenes JPG, PNG o WEBP.", "err");
+            return;
+          }
+        }
+
         const btn = document.getElementById("btnEnviarReporte");
         btn.disabled = true;
         setReporteMsg("Enviando reporte...", "");
@@ -721,22 +810,24 @@
         try {
           const perfilSnap = await getDoc(doc(db, "usuarios", user.uid));
           const nombreReal = perfilSnap.exists() ? perfilSnap.data().nombreReal || user.email : user.email;
-          const fotoPerfilUrl = perfilSnap.exists() ? perfilSnap.data().fotoPerfilUrl || null : null;
+          let fotoPerfilUrl = perfilSnap.exists() ? perfilSnap.data().fotoPerfilUrl || null : null;
           const usernameElegido = perfilSnap.exists() ? perfilSnap.data().username || null : null;
 
-          let archivos = [];
+          try {
+            const imagenesPerfilSnap = await getDoc(doc(db, "perfilesImagenes", user.uid));
+            if (imagenesPerfilSnap.exists()) {
+              fotoPerfilUrl = imagenesPerfilSnap.data().avatar || null;
+            }
+          } catch (errorImagenes) {
+            console.error("No se pudo cargar el icono del perfil:", errorImagenes);
+          }
 
-          // aqui se sube cada archivo que selecciono el usuario
+          let imagenesComprimidas = [];
+
+          // primero se reducen todas para no guardar archivos muy pesados
           for (let i = 0; i < archivosSeleccionados.length; i++) {
-            const archivo = archivosSeleccionados[i];
-            const rutaArchivo = ref(storage, `reportes/${user.uid}/${Date.now()}_${i}_${archivo.name}`);
-            await uploadBytes(rutaArchivo, archivo);
-            const urlArchivo = await getDownloadURL(rutaArchivo);
-
-            archivos.push({
-              nombre: archivo.name,
-              url: urlArchivo,
-            });
+            setReporteMsg(`Reduciendo imagen ${i + 1} de ${archivosSeleccionados.length}...`, "");
+            imagenesComprimidas.push(await comprimirImagen(archivosSeleccionados[i], i === 0));
           }
 
           // aqui se guardan los datos principales del reporte
@@ -744,11 +835,13 @@
             titulo,
             categoria,
             descripcion,
-            archivos,
+            archivos: [],
+            cantidadImagenes: imagenesComprimidas.length,
+            miniatura: imagenesComprimidas.length > 0 ? imagenesComprimidas[0].miniatura : "",
             autorUID: user.uid,
             autorNombre: nombreReal,
             autorUsername: usernameElegido,
-            autorFotoUrl: fotoPerfilUrl,
+            autorFotoUrl: anonimo ? null : fotoPerfilUrl,
             autorCorreo: user.email,
             anonimo,
             destacado: false,
@@ -757,16 +850,17 @@
             estado: "pendiente",
             fecha: serverTimestamp(),
           };
-          await addDoc(collection(db, "reportes"), nuevoReporte);
+          const reporteGuardado = await addDoc(collection(db, "reportes"), nuevoReporte);
 
-          if (window.emailjs && EMAILJS_PUBLIC_KEY !== "TU_PUBLIC_KEY") {
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-              titulo,
-              descripcion,
-              nombre_remitente: nombreReal,
-              correo_remitente: user.email,
-              archivo_url: archivos.length > 0 ? archivos.map((archivo) => archivo.url).join("\n") : "Sin archivos adjuntos",
-              fecha: new Date().toLocaleString("es-CL"),
+          // cada imagen se guarda aparte para no cargarla en la lista de reportes
+          for (let i = 0; i < imagenesComprimidas.length; i++) {
+            const imagen = imagenesComprimidas[i];
+            await setDoc(doc(db, "reportes", reporteGuardado.id, "imagenes", `imagen_${i}`), {
+              nombre: imagen.nombre,
+              tipo: imagen.tipo,
+              datos: imagen.datos,
+              posicion: i,
+              autorUID: user.uid,
             });
           }
 
@@ -816,8 +910,8 @@
               ? '<span class="medallaanonimo">Anónimo</span>'
               : escapeHTML(r.autorNombre || "Usuario") + (r.autorUsername ? ` <span class="nombreautor">(${escapeHTML(r.autorUsername)})</span>` : "");
             const avatarHTML = !r.anonimo && r.autorFotoUrl
-              ? `<img class="avatarautor" src="${r.autorFotoUrl}" alt="">`
-              : `<span class="avatarvacioautor"><svg viewBox="0 0 24 24" fill="currentColor" style="color:#fff"><path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.5c-3.3 0-9.8 1.6-9.8 4.9v2.4h19.6v-2.4c0-3.3-6.5-4.9-9.8-4.9z"/></svg></span>`;
+              ? `<img class="avatarautor" src="${escapeHTML(r.autorFotoUrl)}" alt="Icono del autor">`
+              : `<img class="avatarautor avatargris" src="Archivos/imagen/acclogo.png" alt="Icono anonimo">`;
             const destacadoBadge = r.destacado ? '<span class="medalladestacado">★ Destacado</span>' : "";
             const fechaTexto = r.fecha && r.fecha.toDate ? r.fecha.toDate().toLocaleDateString("es-CL") : "—";
 
@@ -842,7 +936,7 @@
 
         contenedor.innerHTML = '<p class="tablavacia">Cargando tus reportes...</p>';
         try {
-          const q = query(collection(db, "reportes"), where("autorUID", "==", user.uid), orderBy("fecha", "desc"));
+          const q = query(collection(db, "reportes"), where("autorUID", "==", user.uid));
           const snap = await getDocs(q);
 
           if (snap.empty) {
@@ -850,9 +944,18 @@
             return;
           }
 
+          let reportesDelUsuario = [];
+          snap.forEach((docSnap) => reportesDelUsuario.push(docSnap.data()));
+
+          // se ordenan aqui para no necesitar otro indice de firebase
+          reportesDelUsuario.sort((a, b) => {
+            const fechaA = a.fecha && a.fecha.toMillis ? a.fecha.toMillis() : 0;
+            const fechaB = b.fecha && b.fecha.toMillis ? b.fecha.toMillis() : 0;
+            return fechaB - fechaA;
+          });
+
           contenedor.innerHTML = "";
-          snap.forEach((docSnap) => {
-            const r = docSnap.data();
+          reportesDelUsuario.forEach((r) => {
             const fechaTexto = r.fecha && r.fecha.toDate ? r.fecha.toDate().toLocaleString("es-CL") : "—";
             let archivoHTML = "";
 
