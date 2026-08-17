@@ -9,7 +9,6 @@
     <link rel="icon" href="Archivos/imagen/REPORTES LOGO.png" type="image/png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="auth.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   </head>
   <body>
     <div class="capaoscurapatapar" id="navOverlay"></div>
@@ -317,10 +316,15 @@
                 ></textarea>
               </div>
               <div class="grupodeinputs">
-                <label>REPORTE (ARCHIVOS NO DISPONIBLES POR AHORA)</label>
-                <!-- firebase pide un plan de pago para poder subir archivos -->
-                <input type="file" class="inputdearchivo" id="reporteArchivo" multiple disabled />
-                <span class="archivosdesactivados">Los archivos adjuntos se habilitaran mas adelante.</span>
+                <label>IMAGENES DEL REPORTE (OPCIONAL)</label>
+                <input
+                  type="file"
+                  class="inputdearchivo"
+                  id="reporteArchivo"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                />
+                <span class="limitearchivos">Puedes elegir hasta 3 imagenes. Se reduciran antes de guardarlas.</span>
               </div>
               <div class="filacheckanonimo">
                 <input type="checkbox" id="reporteAnonimo" />
@@ -432,18 +436,8 @@
         limit,
         getDocs,
       } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-      import {
-        getStorage,
-        ref,
-        uploadBytes,
-        getDownloadURL,
-      } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
 
-      const EMAILJS_PUBLIC_KEY = "Fdr9w_UZ6HPs_dxC0";
-      const EMAILJS_SERVICE_ID = "service_u15cewk";
-      const EMAILJS_TEMPLATE_ID = "template_xbxkyjk";
       const CORREO_INSPECTOR_MAYOR = "rodrigo.rojas.arbayza@alumnos.sip.cl";
-      if (window.emailjs) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
       const firebaseConfig = {
         apiKey: "AIzaSyCx6yFD14dDDbt2ClRDzhYIhnGgyuhIW-c",
@@ -457,7 +451,6 @@
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const db = getFirestore(app);
-      const storage = getStorage(app);
 
       const msg = document.getElementById("msg");
       const guardLoadingScreen = document.getElementById("guard-loading-screen");
@@ -695,6 +688,65 @@
         reporteMsg.className = tipo || "";
       }
 
+      // aqui se hace una copia mas pequeña de la imagen
+      function comprimirImagen(archivo) {
+        return new Promise((resolve, reject) => {
+          const lector = new FileReader();
+
+          lector.onload = () => {
+            const imagen = new Image();
+
+            imagen.onload = () => {
+              let ancho = imagen.width;
+              let alto = imagen.height;
+              const limite = 900;
+
+              if (ancho > limite || alto > limite) {
+                const proporcion = Math.min(limite / ancho, limite / alto);
+                ancho = Math.round(ancho * proporcion);
+                alto = Math.round(alto * proporcion);
+              }
+
+              const lienzo = document.createElement("canvas");
+              lienzo.width = ancho;
+              lienzo.height = alto;
+              const dibujo = lienzo.getContext("2d");
+
+              // esto evita que una imagen transparente tenga fondo negro
+              dibujo.fillStyle = "#ffffff";
+              dibujo.fillRect(0, 0, ancho, alto);
+              dibujo.drawImage(imagen, 0, 0, ancho, alto);
+
+              let datos = lienzo.toDataURL("image/jpeg", 0.65);
+              let pesoFinal = new Blob([datos]).size;
+
+              // si todavia pesa mucho se intenta una compresion un poco mayor
+              if (pesoFinal > 220 * 1024) {
+                datos = lienzo.toDataURL("image/jpeg", 0.45);
+                pesoFinal = new Blob([datos]).size;
+              }
+
+              if (pesoFinal > 220 * 1024) {
+                reject(new Error("Una imagen sigue pesando demasiado despues de reducirla."));
+                return;
+              }
+
+              resolve({
+                nombre: archivo.name.replace(/\.[^/.]+$/, "") + ".jpg",
+                tipo: "image/jpeg",
+                datos: datos,
+              });
+            };
+
+            imagen.onerror = () => reject(new Error("No se pudo leer una de las imagenes."));
+            imagen.src = lector.result;
+          };
+
+          lector.onerror = () => reject(new Error("No se pudo leer una de las imagenes."));
+          lector.readAsDataURL(archivo);
+        });
+      }
+
       document.getElementById("btnEnviarReporte").addEventListener("click", async () => {
         const user = auth.currentUser;
         if (!user) {
@@ -714,6 +766,20 @@
           return;
         }
 
+        if (archivosSeleccionados.length > 3) {
+          setReporteMsg("Solo puedes elegir hasta 3 imagenes.", "err");
+          return;
+        }
+
+        for (let i = 0; i < archivosSeleccionados.length; i++) {
+          const tiposPermitidos = ["image/jpeg", "image/png", "image/webp"];
+
+          if (!tiposPermitidos.includes(archivosSeleccionados[i].type)) {
+            setReporteMsg("Solo se permiten imagenes JPG, PNG o WEBP.", "err");
+            return;
+          }
+        }
+
         const btn = document.getElementById("btnEnviarReporte");
         btn.disabled = true;
         setReporteMsg("Enviando reporte...", "");
@@ -724,19 +790,12 @@
           const fotoPerfilUrl = perfilSnap.exists() ? perfilSnap.data().fotoPerfilUrl || null : null;
           const usernameElegido = perfilSnap.exists() ? perfilSnap.data().username || null : null;
 
-          let archivos = [];
+          let imagenesComprimidas = [];
 
-          // aqui se sube cada archivo que selecciono el usuario
+          // primero se reducen todas para no guardar archivos muy pesados
           for (let i = 0; i < archivosSeleccionados.length; i++) {
-            const archivo = archivosSeleccionados[i];
-            const rutaArchivo = ref(storage, `reportes/${user.uid}/${Date.now()}_${i}_${archivo.name}`);
-            await uploadBytes(rutaArchivo, archivo);
-            const urlArchivo = await getDownloadURL(rutaArchivo);
-
-            archivos.push({
-              nombre: archivo.name,
-              url: urlArchivo,
-            });
+            setReporteMsg(`Reduciendo imagen ${i + 1} de ${archivosSeleccionados.length}...`, "");
+            imagenesComprimidas.push(await comprimirImagen(archivosSeleccionados[i]));
           }
 
           // aqui se guardan los datos principales del reporte
@@ -744,7 +803,8 @@
             titulo,
             categoria,
             descripcion,
-            archivos,
+            archivos: [],
+            cantidadImagenes: imagenesComprimidas.length,
             autorUID: user.uid,
             autorNombre: nombreReal,
             autorUsername: usernameElegido,
@@ -757,16 +817,17 @@
             estado: "pendiente",
             fecha: serverTimestamp(),
           };
-          await addDoc(collection(db, "reportes"), nuevoReporte);
+          const reporteGuardado = await addDoc(collection(db, "reportes"), nuevoReporte);
 
-          if (window.emailjs && EMAILJS_PUBLIC_KEY !== "TU_PUBLIC_KEY") {
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-              titulo,
-              descripcion,
-              nombre_remitente: nombreReal,
-              correo_remitente: user.email,
-              archivo_url: archivos.length > 0 ? archivos.map((archivo) => archivo.url).join("\n") : "Sin archivos adjuntos",
-              fecha: new Date().toLocaleString("es-CL"),
+          // cada imagen se guarda aparte para no cargarla en la lista de reportes
+          for (let i = 0; i < imagenesComprimidas.length; i++) {
+            const imagen = imagenesComprimidas[i];
+            await setDoc(doc(db, "reportes", reporteGuardado.id, "imagenes", `imagen_${i}`), {
+              nombre: imagen.nombre,
+              tipo: imagen.tipo,
+              datos: imagen.datos,
+              posicion: i,
+              autorUID: user.uid,
             });
           }
 

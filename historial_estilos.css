@@ -314,6 +314,15 @@
     font-size: 0.85rem;
 }
 
+.imagendetalle {
+    width: min(100%, 760px);
+    max-height: 540px;
+    border: 1px solid #3a3d46;
+    border-radius: 4px;
+    object-fit: contain;
+    background: #080a0e;
+}
+
 .sinarchivos {
     color: #888;
     font-size: 0.85rem;
