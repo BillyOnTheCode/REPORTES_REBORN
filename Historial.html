@@ -81,6 +81,8 @@
       } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
       import {
         getFirestore,
+        doc,
+        getDoc,
         collection,
         getDocs,
         query,
@@ -224,11 +226,41 @@
           </div>
         `;
 
+        // si tiene miniatura se coloca sin quitar el diseño amarillo
+        if (reporte.miniatura) {
+          ponerMiniatura(tarjeta, reporte.miniatura);
+        } else if (reporte.cantidadImagenes > 0) {
+          // esto permite que los reportes anteriores tambien tengan una miniatura
+          cargarMiniaturaAnterior(reporte.id, tarjeta);
+        }
+
         tarjeta.querySelector(".botonverreporte").addEventListener("click", () => {
           abrirDetalle(reporte);
         });
 
         return tarjeta;
+      }
+
+      function ponerMiniatura(tarjeta, datosImagen) {
+        const portada = tarjeta.querySelector(".portadareporte");
+        const miniatura = document.createElement("img");
+        portada.classList.add("conminiatura");
+        miniatura.src = datosImagen;
+        miniatura.alt = "Miniatura del reporte";
+        portada.appendChild(miniatura);
+      }
+
+      async function cargarMiniaturaAnterior(reporteId, tarjeta) {
+        try {
+          // solo se busca la primera imagen de los reportes que no tenian miniatura
+          const imagenDoc = await getDoc(doc(db, "reportes", reporteId, "imagenes", "imagen_0"));
+
+          if (imagenDoc.exists()) {
+            ponerMiniatura(tarjeta, imagenDoc.data().datos);
+          }
+        } catch (error) {
+          console.error("No se pudo cargar la miniatura anterior:", error);
+        }
       }
 
       // aqui se pone toda la informacion dentro de la ventana

@@ -432,8 +432,6 @@
         serverTimestamp,
         query,
         where,
-        orderBy,
-        limit,
         getDocs,
       } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -588,14 +586,15 @@
         });
       };
 
-      onAuthStateChanged(auth, (user) => {
+      onAuthStateChanged(auth, async (user) => {
         const loginScreen = document.getElementById("pantalla-login");
         const mainContent = document.getElementById("pagina-protegida");
 
         if (user) {
           loginScreen.style.display = "none";
           mainContent.style.display = "block";
-          revisarAccesoInspector(user);
+          // se espera el rol antes de quitar la pantalla de carga
+          await revisarAccesoInspector(user);
         } else {
           loginScreen.style.display = "flex";
           mainContent.style.display = "none";
@@ -689,7 +688,7 @@
       }
 
       // aqui se hace una copia mas pequeña de la imagen
-      function comprimirImagen(archivo) {
+      function comprimirImagen(archivo, crearMiniatura) {
         return new Promise((resolve, reject) => {
           const lector = new FileReader();
 
@@ -731,10 +730,34 @@
                 return;
               }
 
+              let miniatura = "";
+
+              if (crearMiniatura) {
+                const limiteMiniatura = 360;
+                const proporcionMiniatura = Math.min(limiteMiniatura / imagen.width, limiteMiniatura / imagen.height, 1);
+                const miniLienzo = document.createElement("canvas");
+                miniLienzo.width = Math.round(imagen.width * proporcionMiniatura);
+                miniLienzo.height = Math.round(imagen.height * proporcionMiniatura);
+                const miniDibujo = miniLienzo.getContext("2d");
+                miniDibujo.fillStyle = "#ffffff";
+                miniDibujo.fillRect(0, 0, miniLienzo.width, miniLienzo.height);
+                miniDibujo.drawImage(imagen, 0, 0, miniLienzo.width, miniLienzo.height);
+                miniatura = miniLienzo.toDataURL("image/jpeg", 0.45);
+
+                if (new Blob([miniatura]).size > 45000) {
+                  miniatura = miniLienzo.toDataURL("image/jpeg", 0.3);
+                }
+
+                if (new Blob([miniatura]).size > 45000) {
+                  miniatura = "";
+                }
+              }
+
               resolve({
                 nombre: archivo.name.replace(/\.[^/.]+$/, "") + ".jpg",
                 tipo: "image/jpeg",
                 datos: datos,
+                miniatura: miniatura,
               });
             };
 
@@ -795,7 +818,7 @@
           // primero se reducen todas para no guardar archivos muy pesados
           for (let i = 0; i < archivosSeleccionados.length; i++) {
             setReporteMsg(`Reduciendo imagen ${i + 1} de ${archivosSeleccionados.length}...`, "");
-            imagenesComprimidas.push(await comprimirImagen(archivosSeleccionados[i]));
+            imagenesComprimidas.push(await comprimirImagen(archivosSeleccionados[i], i === 0));
           }
 
           // aqui se guardan los datos principales del reporte
@@ -805,6 +828,7 @@
             descripcion,
             archivos: [],
             cantidadImagenes: imagenesComprimidas.length,
+            miniatura: imagenesComprimidas.length > 0 ? imagenesComprimidas[0].miniatura : "",
             autorUID: user.uid,
             autorNombre: nombreReal,
             autorUsername: usernameElegido,
@@ -903,7 +927,7 @@
 
         contenedor.innerHTML = '<p class="tablavacia">Cargando tus reportes...</p>';
         try {
-          const q = query(collection(db, "reportes"), where("autorUID", "==", user.uid), orderBy("fecha", "desc"));
+          const q = query(collection(db, "reportes"), where("autorUID", "==", user.uid));
           const snap = await getDocs(q);
 
           if (snap.empty) {
@@ -911,9 +935,18 @@
             return;
           }
 
+          let reportesDelUsuario = [];
+          snap.forEach((docSnap) => reportesDelUsuario.push(docSnap.data()));
+
+          // se ordenan aqui para no necesitar otro indice de firebase
+          reportesDelUsuario.sort((a, b) => {
+            const fechaA = a.fecha && a.fecha.toMillis ? a.fecha.toMillis() : 0;
+            const fechaB = b.fecha && b.fecha.toMillis ? b.fecha.toMillis() : 0;
+            return fechaB - fechaA;
+          });
+
           contenedor.innerHTML = "";
-          snap.forEach((docSnap) => {
-            const r = docSnap.data();
+          reportesDelUsuario.forEach((r) => {
             const fechaTexto = r.fecha && r.fecha.toDate ? r.fecha.toDate().toLocaleString("es-CL") : "—";
             let archivoHTML = "";
 

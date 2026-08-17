@@ -106,7 +106,13 @@ service cloud.firestore {
         request.resource.data.estado == 'pendiente' &&
         request.resource.data.prioridad == 'sin_asignar' &&
         request.resource.data.get('cantidadImagenes', 0) >= 0 &&
-        request.resource.data.get('cantidadImagenes', 0) <= 3;
+        request.resource.data.get('cantidadImagenes', 0) <= 3 &&
+        request.resource.data.get('miniatura', '') is string &&
+        request.resource.data.get('miniatura', '').size() <= 50000 &&
+        (
+          request.resource.data.get('miniatura', '') == '' ||
+          request.resource.data.get('miniatura', '').matches('data:image/jpeg;base64,.*')
+        );
 
       // los inspectores solo cambian los datos de la revision
       allow update: if esInspector() &&
