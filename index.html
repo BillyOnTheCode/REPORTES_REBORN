@@ -25,8 +25,8 @@
         <li>
           <a href="cuenta.html" class="enlacemenuxd">Cuenta<span class="flechitamenu">›</span></a>
         </li>
-        <li>
-          <a href="Historial.html" class="enlacemenuxd">Historial de Reportes<span class="flechitamenu">›</span></a>
+        <li> <!-- Cambio de historial a Lista ; ASIGNADO PARA: NICOLAS MESA (al cambiar a Lista el Historial, verifica que hasta el Historial.html tenga lo mismo Lista.html y los enlaces con lo mismo)-->
+          <a href="Historial.html" class="enlacemenuxd">Historial de Reportes<span class="flechitamenu">›</span></a> 
         </li>
         <li id="menuAdministracion" style="display: none;">
           <a href="inspectores.html" class="enlacemenuxd">Administración<span class="flechitamenu">›</span></a>
@@ -147,11 +147,12 @@
         <form class="formulariocustom" id="form-registro" style="display: none" autocomplete="off">
           <div class="grilladeregistro">
             <div class="grupodeinputs">
+              <!-- Cambio de espacio de caja de inputs: Marko Jaramillo ; en los chromebooks estos se sobresalen, reduse el tamaño horizontal de este sin exagerar, usa css tmb (revisa lineas 400 - 450) -->  
               <label>RUT</label>
               <input
                 type="text"
                 id="regRut"
-                placeholder="RUT sin Guion ni Puntos."
+                placeholder="00000000-0"
                 required
               />
             </div>
@@ -281,6 +282,7 @@
         </section>
 
         <div id="report-screen">
+          <!-- Solucionar altura de Caja (se ve el error en chromebook ; ASIGNADO PARA MILA ) -->
           <div class="tarjetitamodal">
             <a href="#" class="flechaparatras" id="cerrarReporte">← VOLVER</a>
             <h2>NUEVO REPORTE</h2>
@@ -393,6 +395,7 @@
           <a href="#" class="flechaparatras" id="cerrarSoporte">← VOLVER</a>
           <h2>SOPORTE</h2>
           <div class="contenidosoporte">
+            <!-- Redireccionando imagen para que sea visible ; ASIGNADO: SAMIR PEÑA -->
             <img class="avatarsoporte" src="Imagen/REPORTES LOGO.png" alt="Reportes SIP"/>
             <div class="infosoporte">
               <h3>CYBERTILINES TEAM</h3>
