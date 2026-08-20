@@ -513,6 +513,18 @@
             ponerInspector(cuenta, tarjeta);
           });
           acciones.appendChild(botonAgregar);
+
+          // esto es solo para probar una cuenta como alumno o profesor
+          if (rolActual === "inspector_mayor") {
+            const botonTipo = document.createElement("button");
+            const rolNuevo = rol === "profesor" ? "alumno" : "profesor";
+            botonTipo.className = "botoncambiartipo";
+            botonTipo.innerText = rolNuevo === "profesor" ? "PROBAR COMO PROFESOR" : "VOLVER A ALUMNO";
+            botonTipo.addEventListener("click", () => {
+              cambiarTipoCuenta(cuenta, rolNuevo, tarjeta);
+            });
+            acciones.appendChild(botonTipo);
+          }
         }
 
         return tarjeta;
@@ -551,6 +563,27 @@
           console.error(error);
           boton.disabled = false;
           boton.innerText = "NO SE PUDO GUARDAR";
+        }
+      }
+
+      async function cambiarTipoCuenta(cuenta, rolNuevo, tarjeta) {
+        const nombreNuevo = rolNuevo === "profesor" ? "profesor" : "alumno";
+
+        if (!confirm(`¿Quieres usar esta cuenta como ${nombreNuevo} para hacer pruebas?`)) return;
+
+        const botones = tarjeta.querySelectorAll("button");
+        botones.forEach((boton) => boton.disabled = true);
+
+        try {
+          // se guarda un solo rol para que no pueda ser alumno y profesor a la vez
+          await updateDoc(doc(db, "usuarios", cuenta.id), {
+            rol: rolNuevo,
+          });
+          await cargarCuentas();
+        } catch (error) {
+          console.error(error);
+          botones.forEach((boton) => boton.disabled = false);
+          alert("No se pudo cambiar el tipo de cuenta.");
         }
       }
 
@@ -617,7 +650,7 @@
         const texto = document.getElementById("textoPermisoCuentas");
 
         if (rolActual === "inspector_mayor") {
-          texto.innerText = "Puedes poner y quitar inspectores. La cuenta de inspector mayor no se puede cambiar desde aqui.";
+          texto.innerText = "Puedes poner y quitar inspectores. Tambien puedes probar una cuenta normal como alumno o profesor. La cuenta de inspector mayor no se puede cambiar desde aqui.";
         } else {
           texto.innerText = "Puedes ayudar nombrando nuevos inspectores, pero no puedes quitar el rol de otra cuenta.";
         }
