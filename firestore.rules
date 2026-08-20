@@ -84,7 +84,14 @@ service cloud.firestore {
           (
             esInspectorMayor() &&
             correoCuenta != 'rodrigo.rojas.arbayza@alumnos.sip.cl' &&
-            (rolNuevo == 'inspector' || rolNuevo == rolNormal(correoCuenta))
+            (
+              rolNuevo == 'inspector' ||
+              rolNuevo == rolNormal(correoCuenta) ||
+              (
+                rolAnterior in ['alumno', 'profesor'] &&
+                rolNuevo in ['alumno', 'profesor']
+              )
+            )
           ) ||
           (
             !esInspectorMayor() &&
