@@ -533,6 +533,11 @@ body {
     font-size: 0.85rem;
 }
 
+.logosoport {
+    width:150px ;
+    height: 150px;
+}
+
 .textocentrado a {
     color: var(--gold);
     text-decoration: none;
