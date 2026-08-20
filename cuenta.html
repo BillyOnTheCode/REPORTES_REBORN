@@ -288,6 +288,8 @@
         }
 
         try {
+          // se renueva el permiso antes de cargar el perfil
+          await user.getIdToken(true);
           const userDoc = await getDoc(doc(db, "usuarios", user.uid));
 
           if (userDoc.exists()) {

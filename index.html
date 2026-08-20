@@ -676,6 +676,8 @@
           mainContent.style.display = "none";
           mostrarPantallaVerificacion(user, "Debes confirmar este correo antes de entrar.");
         } else if (user) {
+          // se renueva el permiso para que firestore vea el correo verificado
+          await user.getIdToken(true);
           loginScreen.style.display = "none";
           mainContent.style.display = "block";
           // se espera el rol antes de quitar la pantalla de carga

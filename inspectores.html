@@ -150,6 +150,8 @@
         usuarioActual = user;
 
         try {
+          // se renueva el permiso antes de revisar si es inspector
+          await user.getIdToken(true);
           const perfil = await getDoc(doc(db, "usuarios", user.uid));
           rolActual = perfil.exists() ? perfil.data().rol || "" : "";
 

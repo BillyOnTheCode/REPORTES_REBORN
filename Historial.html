@@ -125,6 +125,8 @@
         }
 
         try {
+          // se renueva el permiso antes de pedir los reportes
+          await user.getIdToken(true);
           const perfil = await getDoc(doc(db, "usuarios", user.uid));
           const rol = perfil.exists() ? perfil.data().rol || "" : "";
           const esInspector = rol === "inspector" || rol === "inspector_mayor" ||
