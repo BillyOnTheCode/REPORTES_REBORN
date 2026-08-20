@@ -504,6 +504,13 @@ body {
     align-items: flex-start;
 }
 
+.filacheckanonimo.anonimoprofesor {
+    padding: 10px;
+    border-left: 3px solid var(--gold);
+    background: rgba(255, 204, 0, 0.08);
+    color: var(--gold);
+}
+
 .botonpaenviar {
     background: var(--gold);
     color: #000;

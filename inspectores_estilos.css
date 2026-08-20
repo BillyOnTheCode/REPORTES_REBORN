@@ -181,6 +181,21 @@
     text-transform: uppercase;
 }
 
+.origenadmin {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 3px 6px;
+    border: 1px solid #626776;
+    color: #c8ccd6;
+    font-size: 0.62rem;
+    font-weight: bold;
+}
+
+.origenadmin.origen-profesor {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
 .fechaadmin,
 .autoradmin {
     color: #999;

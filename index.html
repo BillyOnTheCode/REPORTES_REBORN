@@ -330,7 +330,7 @@
               </div>
               <div class="filacheckanonimo">
                 <input type="checkbox" id="reporteAnonimo" />
-                <label for="reporteAnonimo"
+                <label for="reporteAnonimo" id="textoAnonimoReporte"
                   >Publicar de forma anónima en la tabla de reportes destacados (el
                   correo interno siempre incluye tu identidad)</label
                 >
@@ -439,6 +439,8 @@
       } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
       const CORREO_INSPECTOR_MAYOR = "rodrigo.rojas.arbayza@alumnos.sip.cl";
+      let rolUsuarioActual = "";
+      let tipoCuentaActual = "alumno";
 
       const firebaseConfig = {
         apiKey: "AIzaSyCx6yFD14dDDbt2ClRDzhYIhnGgyuhIW-c",
@@ -599,6 +601,8 @@
           // se espera el rol antes de quitar la pantalla de carga
           await revisarAccesoInspector(user);
         } else {
+          rolUsuarioActual = "";
+          tipoCuentaActual = "alumno";
           loginScreen.style.display = "flex";
           mainContent.style.display = "none";
 
@@ -632,12 +636,42 @@
           const perfil = await getDoc(doc(db, "usuarios", user.uid));
           const rol = perfil.exists() ? perfil.data().rol || "" : "";
           const esMayor = user.email.toLowerCase() === CORREO_INSPECTOR_MAYOR;
+          rolUsuarioActual = esMayor ? "inspector_mayor" : rol;
+          tipoCuentaActual = obtenerTipoCuenta(rolUsuarioActual, user.email);
+          configurarAnonimatoReporte();
 
           if (rol === "inspector" || rol === "inspector_mayor" || esMayor) {
             menuAdministracion.style.display = "block";
           }
         } catch (error) {
           console.error("No se pudo revisar el rol:", error);
+          tipoCuentaActual = obtenerTipoCuenta("", user.email);
+          configurarAnonimatoReporte();
+        }
+      }
+
+      function obtenerTipoCuenta(rol, correo) {
+        if (rol === "profesor") return "profesor";
+        if (rol === "alumno") return "alumno";
+        return (correo || "").toLowerCase().endsWith("@sip.cl") ? "profesor" : "alumno";
+      }
+
+      function configurarAnonimatoReporte() {
+        const checkAnonimo = document.getElementById("reporteAnonimo");
+        const textoAnonimo = document.getElementById("textoAnonimoReporte");
+        const filaAnonimo = checkAnonimo ? checkAnonimo.closest(".filacheckanonimo") : null;
+
+        if (!checkAnonimo || !textoAnonimo) return;
+
+        if (tipoCuentaActual === "profesor") {
+          checkAnonimo.checked = true;
+          checkAnonimo.disabled = true;
+          textoAnonimo.innerText = "Los reportes de profesores siempre se publican de forma anonima.";
+          if (filaAnonimo) filaAnonimo.classList.add("anonimoprofesor");
+        } else {
+          checkAnonimo.disabled = false;
+          textoAnonimo.innerText = "Publicar de forma anonima en la tabla de reportes destacados (el correo interno siempre incluye tu identidad)";
+          if (filaAnonimo) filaAnonimo.classList.remove("anonimoprofesor");
         }
       }
 
@@ -646,6 +680,7 @@
 
       document.getElementById("abrirReporte").addEventListener("click", (e) => {
         e.preventDefault();
+        configurarAnonimatoReporte();
         reportScreen.classList.add("is-open");
       });
       document.getElementById("cerrarReporte").addEventListener("click", (e) => {
@@ -785,7 +820,8 @@
         const descripcion = document.getElementById("reporteDescripcion").value.trim();
         const archivoInput = document.getElementById("reporteArchivo");
         const archivosSeleccionados = archivoInput.files;
-        const anonimo = document.getElementById("reporteAnonimo").checked;
+        // los profesores no pueden quitar el modo anonimo
+        const anonimo = tipoCuentaActual === "profesor" ? true : document.getElementById("reporteAnonimo").checked;
 
         if (!titulo || !categoria || !descripcion) {
           setReporteMsg("Completa el título, la categoria y la descripción.", "err");
@@ -842,10 +878,12 @@
             cantidadImagenes: imagenesComprimidas.length,
             miniatura: imagenesComprimidas.length > 0 ? imagenesComprimidas[0].miniatura : "",
             autorUID: user.uid,
-            autorNombre: nombreReal,
-            autorUsername: usernameElegido,
-            autorFotoUrl: anonimo ? null : fotoPerfilUrl,
-            autorCorreo: user.email,
+            // los datos del profesor no se colocan dentro del reporte
+            autorNombre: tipoCuentaActual === "profesor" ? null : nombreReal,
+            autorUsername: tipoCuentaActual === "profesor" ? null : usernameElegido,
+            autorFotoUrl: anonimo || tipoCuentaActual === "profesor" ? null : fotoPerfilUrl,
+            autorCorreo: tipoCuentaActual === "profesor" ? null : user.email,
+            tipoAutor: tipoCuentaActual,
             anonimo,
             destacado: false,
             // despues el administrador podra cambiar estos dos datos
@@ -869,6 +907,7 @@
 
           setReporteMsg("¡Reporte enviado con éxito!", "ok");
           document.getElementById("form-reporte").reset();
+          configurarAnonimatoReporte();
           cargarLeaderboard();
 
           setTimeout(() => {

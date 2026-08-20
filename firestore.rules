@@ -31,6 +31,12 @@ service cloud.firestore {
       return correo.lower().matches('.*@sip\\.cl$') ? 'profesor' : 'alumno';
     }
 
+    function tipoDeLaCuenta() {
+      let rol = rolDeLaCuenta();
+      return rol == 'profesor' ? 'profesor' :
+        rol == 'alumno' ? 'alumno' : rolNormal(correoActual());
+    }
+
     function puedeVerImagen(reporteId) {
       let reporte = get(/databases/$(database)/documents/reportes/$(reporteId));
       return esInspector() || (
@@ -131,6 +137,7 @@ service cloud.firestore {
       // todos los reportes nuevos tienen que empezar pendientes
       allow create: if tieneSesion() &&
         request.resource.data.autorUID == request.auth.uid &&
+        request.resource.data.tipoAutor == tipoDeLaCuenta() &&
         request.resource.data.estado == 'pendiente' &&
         request.resource.data.prioridad == 'sin_asignar' &&
         request.resource.data.get('cantidadImagenes', 0) >= 0 &&
@@ -143,14 +150,29 @@ service cloud.firestore {
         ) &&
         (
           (
+            request.resource.data.tipoAutor == 'profesor' &&
             request.resource.data.anonimo == true &&
-            request.resource.data.autorFotoUrl == null
+            request.resource.data.autorNombre == null &&
+            request.resource.data.autorUsername == null &&
+            request.resource.data.autorFotoUrl == null &&
+            request.resource.data.autorCorreo == null
           ) ||
           (
-            request.resource.data.anonimo == false &&
+            request.resource.data.tipoAutor == 'alumno' &&
+            request.resource.data.autorCorreo is string &&
+            request.resource.data.autorCorreo.lower() == correoActual() &&
             (
-              request.resource.data.autorFotoUrl == null ||
-              imagenPerfilValida(request.resource.data.autorFotoUrl, 65000)
+              (
+                request.resource.data.anonimo == true &&
+                request.resource.data.autorFotoUrl == null
+              ) ||
+              (
+                request.resource.data.anonimo == false &&
+                (
+                  request.resource.data.autorFotoUrl == null ||
+                  imagenPerfilValida(request.resource.data.autorFotoUrl, 65000)
+                )
+              )
             )
           )
         );
