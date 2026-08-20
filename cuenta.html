@@ -282,7 +282,7 @@
 
       // Cargar datos del perfil
       onAuthStateChanged(auth, async (user) => {
-        if (!user) {
+        if (!user || !user.emailVerified) {
           window.location.href = "index.html";
           return;
         }

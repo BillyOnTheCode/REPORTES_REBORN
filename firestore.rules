@@ -10,9 +10,18 @@ service cloud.firestore {
       return request.auth.token.get('email', '').lower();
     }
 
-    function esInspectorMayor() {
+    function correoVerificado() {
+      return tieneSesion() &&
+        request.auth.token.get('email_verified', false) == true;
+    }
+
+    function esCorreoInspectorMayor() {
       return tieneSesion() &&
         correoActual() == 'rodrigo.rojas.arbayza@alumnos.sip.cl';
+    }
+
+    function esInspectorMayor() {
+      return correoVerificado() && esCorreoInspectorMayor();
     }
 
     function rolDeLaCuenta() {
@@ -20,7 +29,7 @@ service cloud.firestore {
     }
 
     function esInspector() {
-      return tieneSesion() && (
+      return correoVerificado() && (
         esInspectorMayor() ||
         rolDeLaCuenta() == 'inspector' ||
         rolDeLaCuenta() == 'inspector_mayor'
@@ -40,9 +49,12 @@ service cloud.firestore {
     function puedeVerImagen(reporteId) {
       let reporte = get(/databases/$(database)/documents/reportes/$(reporteId));
       return esInspector() || (
-        tieneSesion() && (
-          reporte.data.estado == 'aprobado' ||
-          reporte.data.autorUID == request.auth.uid
+        correoVerificado() && (
+          reporte.data.autorUID == request.auth.uid ||
+          (
+            reporte.data.estado == 'aprobado' &&
+            reporte.data.tipoAutor == tipoDeLaCuenta()
+          )
         )
       );
     }
@@ -59,17 +71,17 @@ service cloud.firestore {
         request.auth.uid == usuarioId &&
         request.resource.data.correo.lower() == correoActual() &&
         (
-          (esInspectorMayor() && request.resource.data.rol == 'inspector_mayor') ||
-          (!esInspectorMayor() && request.resource.data.rol == rolNormal(correoActual()))
+          (esCorreoInspectorMayor() && request.resource.data.rol == 'inspector_mayor') ||
+          (!esCorreoInspectorMayor() && request.resource.data.rol == rolNormal(correoActual()))
         );
 
       // los inspectores necesitan ver las cuentas para poder dar el rol
-      allow read: if tieneSesion() && (
+      allow read: if correoVerificado() && (
         request.auth.uid == usuarioId || esInspector()
       );
 
       // un usuario normal solo puede cambiar su apodo y su biografia
-      allow update: if tieneSesion() && (
+      allow update: if correoVerificado() && (
         (
           request.auth.uid == usuarioId &&
           request.resource.data.diff(resource.data).affectedKeys()
@@ -112,30 +124,33 @@ service cloud.firestore {
 
     match /perfilesImagenes/{usuarioId} {
       // estas imagenes estan separadas para no pesar en la lista de cuentas
-      allow read: if tieneSesion() && (
+      allow read: if correoVerificado() && (
         request.auth.uid == usuarioId || esInspector()
       );
 
-      allow create, update: if tieneSesion() &&
+      allow create, update: if correoVerificado() &&
         request.auth.uid == usuarioId &&
         request.resource.data.keys().hasOnly(['avatar', 'banner']) &&
         imagenPerfilValida(request.resource.data.avatar, 65000) &&
         imagenPerfilValida(request.resource.data.banner, 120000);
 
-      allow delete: if tieneSesion() && request.auth.uid == usuarioId;
+      allow delete: if correoVerificado() && request.auth.uid == usuarioId;
     }
 
     match /reportes/{reporteId} {
-      // un alumno puede ver los aprobados y tambien sus propios reportes
+      // cada grupo puede ver los aprobados de su tipo y sus propios reportes
       allow read: if esInspector() || (
-        tieneSesion() && (
-          resource.data.estado == 'aprobado' ||
-          resource.data.autorUID == request.auth.uid
+        correoVerificado() && (
+          resource.data.autorUID == request.auth.uid ||
+          (
+            resource.data.estado == 'aprobado' &&
+            resource.data.tipoAutor == tipoDeLaCuenta()
+          )
         )
       );
 
       // todos los reportes nuevos tienen que empezar pendientes
-      allow create: if tieneSesion() &&
+      allow create: if correoVerificado() &&
         request.resource.data.autorUID == request.auth.uid &&
         request.resource.data.tipoAutor == tipoDeLaCuenta() &&
         request.resource.data.estado == 'pendiente' &&
@@ -191,12 +206,47 @@ service cloud.firestore {
             'revisadoEn'
           ])
         ) || (
-          tieneSesion() &&
+          correoVerificado() &&
           resource.data.autorUID == request.auth.uid &&
           resource.data.anonimo == false &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['autorFotoUrl']) &&
           imagenPerfilValida(request.resource.data.autorFotoUrl, 65000)
-        );
+        ) || esMigracionAnterior();
+
+      function esMigracionAnterior() {
+        let cambios = request.resource.data.diff(resource.data).affectedKeys();
+        let correoAnterior = resource.data.get('autorCorreo', '');
+        let tipoNuevo = request.resource.data.get('tipoAutor', '');
+
+        return esInspectorMayor() &&
+          !resource.data.keys().hasAny(['tipoAutor']) &&
+          (
+            (
+              tipoNuevo == 'profesor' &&
+              correoAnterior is string &&
+              correoAnterior.lower().matches('.*@sip\\.cl$') &&
+              cambios.hasOnly([
+                'tipoAutor',
+                'anonimo',
+                'autorNombre',
+                'autorUsername',
+                'autorFotoUrl',
+                'autorCorreo'
+              ]) &&
+              request.resource.data.anonimo == true &&
+              request.resource.data.autorNombre == null &&
+              request.resource.data.autorUsername == null &&
+              request.resource.data.autorFotoUrl == null &&
+              request.resource.data.autorCorreo == null
+            ) ||
+            (
+              tipoNuevo == 'alumno' &&
+              correoAnterior is string &&
+              !correoAnterior.lower().matches('.*@sip\\.cl$') &&
+              cambios.hasOnly(['tipoAutor'])
+            )
+          );
+      }
 
       // los inspectores pueden limpiar reportes de prueba o que ya no sirven
       allow delete: if esInspector();
@@ -206,7 +256,7 @@ service cloud.firestore {
         allow read: if puedeVerImagen(reporteId);
 
         // los nombres fijos evitan que alguien guarde mas de tres imagenes
-        allow create: if tieneSesion() &&
+        allow create: if correoVerificado() &&
           imagenId in ['imagen_0', 'imagen_1', 'imagen_2'] &&
           get(/databases/$(database)/documents/reportes/$(reporteId)).data.autorUID == request.auth.uid &&
           get(/databases/$(database)/documents/reportes/$(reporteId)).data.estado == 'pendiente' &&
