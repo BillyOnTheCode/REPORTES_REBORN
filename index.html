@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="auth.js" defer></script>
   </head>
+
+  <!--Fin de la cabeza de la pagina-->
+
   <body>
     <div class="capaoscurapatapar" id="navOverlay"></div>
 
@@ -21,6 +24,7 @@
           CYBER<span class="doradito">TILINES</span>
         </div>
       </div>
+      <!--Links de las secciones de las paginas-->
       <ul class="listadelmenu">
         <li>
           <a href="cuenta.html" class="enlacemenuxd">Cuenta<span class="flechitamenu">›</span></a>
@@ -536,7 +540,7 @@
           guardLoadingScreen.style.opacity = "1";
           guardLoadingScreen.style.visibility = "visible";
         }
-
+        //fin de condicionales
         createUserWithEmailAndPassword(auth, email, pass)
           .then(async (userCredential) => {
             const user = userCredential.user;
