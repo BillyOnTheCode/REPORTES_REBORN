@@ -72,7 +72,7 @@
                         <img id="accAvatarPreview" src="Archivos/imagen/acclogo.png" alt="Icono del perfil" />
                     </div>
                 </div>
-
+                <!-- Controles para actualizar imágenes de perfil -->
                 <div class="controles-imagenes-perfil">
                     <label>
                         ICONO
@@ -83,7 +83,7 @@
                         <input type="file" class="inputdearchivo" id="accBannerArchivo" accept="image/jpeg,image/png,image/webp" />
                     </label>
                 </div>
-
+                <!--campo donde de coloca tu informacion personal-->
                 <h2 style="color: var(--gold); margin-top: 0;">INFORMACIÓN PERSONAL</h2>
                 <form class="formulariocustom" id="form-actualizar-perfil">
                     <div class="grilla-perfil">
@@ -91,28 +91,28 @@
                             <label>NOMBRE COMPLETO</label>
                             <input type="text" id="accNombre" placeholder="Cargando..." readonly style="opacity: 0.7; cursor: not-allowed;" />
                         </div>
-                        
+                        <!--campo donde se coloca el RUT-->
                         <div class="grupodeinputs">
                             <label>RUT REGISTRADO</label>
                             <input type="text" id="accRut" placeholder="Cargando..." readonly style="opacity: 0.7; cursor: not-allowed;" />
                         </div>
-<!--aqui esta el correo institucional-->
+                        <!--campo donde se coloca el Correo-->
                         <div class="grupodeinputs">
                             <label>CORREO INSTITUCIONAL</label>
                             <input type="email" id="accCorreo" placeholder="Cargando..." readonly style="opacity: 0.7; cursor: not-allowed;" />
                         </div>
-
+                        <!--campo donde se coloca el Nombre de Usuario-->
                         <div class="grupodeinputs">
                             <label>NOMBRE DE USUARIO (APODO)</label>
                             <input type="text" id="accUsername" placeholder="Ej: CyberUser99" />
                         </div>
                     </div>
-
+                    <!--campo donde se coloca la biografia o presentacion que quieras colocar-->
                     <div class="grupodeinputs" style="margin-top: 15px;">
                         <label>BIOGRAFÍA / PRESENTACIÓN</label>
                         <textarea id="accBio" rows="3" placeholder="Escribe algo sobre ti..."></textarea>
                     </div>
-
+                    <!--boton para guardar los cambios de la zona anterior-->
                     <button type="button" class="botonpaenviar" id="btnGuardarPerfil" style="width: auto; padding: 12px 30px; align-self: flex-start;">
                         GUARDAR CAMBIOS
                     </button>
