@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="auth.js" defer></script>
   </head>
+
+  <!--Fin de la cabeza de la pagina-->
+
   <body>
     <div class="capaoscurapatapar" id="navOverlay"></div>
 
@@ -21,6 +24,7 @@
           CYBER<span class="doradito">TILINES</span>
         </div>
       </div>
+      <!--Links de las secciones de las paginas-->
       <ul class="listadelmenu">
         <li>
           <a href="cuenta.html" class="enlacemenuxd">Cuenta<span class="flechitamenu">›</span></a>
@@ -67,7 +71,7 @@
         <div class="textodelamarca">CyberTilines® — Reportes SIP©</div>
       </div>
     </nav>
-
+    <!--Animacion de carga-->
     <div id="guard-loading-screen">
       <div class="titulocargando">
         SISTEMA // VERIFICANDO CREDENCIALES...
@@ -79,7 +83,7 @@
         Sincronizando datos: OK!
       </div>
     </div>
-
+    <!--Fin de Animacion de carga-->
     <!-- Fondo de Login -->
     <section id="pantalla-login" class="pantallacompletalogin">
       <figure class="cajatextofondo">
@@ -114,7 +118,7 @@
               autocomplete="new-password"
             />
           </div>
-
+          <!--Apartado de contraseñas-->
           <div class="grupodeinputs">
             <label>CONTRASEÑA</label>
             <input
@@ -133,7 +137,7 @@
             </div>
             <span>Recordarme</span>
           </label>
-
+          
           <button type="button" id="btnLogin" class="botonpaenviar">
             INGRESAR
           </button>
@@ -158,6 +162,7 @@
               />
             </div>
             <div class="grupodeinputs">
+              <!--Para ingresar el correo Instucional-->
               <label>CORREO INST.</label>
               <input
                 type="email"
@@ -170,6 +175,7 @@
           </div>
           <div class="grilladeregistro">
             <div class="grupodeinputs">
+              <!--Para ingresar datos-->
               <label>CONTRASEÑA</label>
               <input
                 type="password"
@@ -247,7 +253,7 @@
         </div>
         <div class="lineacabecera"></div>
       </header>
-
+      <!--Fin de la cabecera-->
       <main class="contenedor">
         <section class="seccionhero">
           <div class="cajadeimagen">
@@ -410,7 +416,7 @@
           <a href="#" class="flechaparatras" id="cerrarSoporte">← VOLVER</a>
           <h2>SOPORTE</h2>
           <div class="contenidosoporte">
-            <!-- Redireccionando imagen para que sea visible ; ASIGNADO: SAMIR PEÑA -->
+            <!-- Redireccionando imagen para que sea visible ; ASIGNADO: SAMIR PEÑA X LISTO-->
             <img class="avatarsoporte" src="Archivos/imagen/REPORTES_LOGO.png" alt="Reportes SIP"/>
             <div class="infosoporte">
               <h3>CYBERTILINES TEAM</h3>
@@ -486,7 +492,7 @@
         const apellidoFormateado = apellidoRaw.charAt(0).toUpperCase() + apellidoRaw.slice(1);
         return `${nombreFormateado} ${apellidoFormateado}`.trim();
       }
-
+      //Algunas funciones de la pagina
       document.getElementById("ir-a-registro").onclick = (e) => {
         e.preventDefault();
         document.getElementById("panel-verificacion").style.display = "none";
@@ -511,7 +517,7 @@
         const email = contenedor.querySelector("#regEmailSip").value.toLowerCase().trim();
         const pass = contenedor.querySelector("#regPassSip").value;
         const confirm = contenedor.querySelector("#regConfirmPassSip").value;
-
+        //condicionales por si los datos no son validos
         if (typeof validarRut === "function" && !validarRut(rut)) {
           msg.innerText = "Error: El RUT es inválido.";
           return;
@@ -537,7 +543,7 @@
           guardLoadingScreen.style.opacity = "1";
           guardLoadingScreen.style.visibility = "visible";
         }
-
+        //fin de condicionales
         createUserWithEmailAndPassword(auth, email, pass)
           .then(async (userCredential) => {
             const user = userCredential.user;
