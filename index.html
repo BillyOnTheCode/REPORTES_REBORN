@@ -510,7 +510,7 @@
         const email = contenedor.querySelector("#regEmailSip").value.toLowerCase().trim();
         const pass = contenedor.querySelector("#regPassSip").value;
         const confirm = contenedor.querySelector("#regConfirmPassSip").value;
-
+        //condicionales por si los datos no son validos
         if (typeof validarRut === "function" && !validarRut(rut)) {
           msg.innerText = "Error: El RUT es inválido.";
           return;
