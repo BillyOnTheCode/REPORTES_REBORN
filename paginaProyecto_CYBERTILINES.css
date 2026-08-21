@@ -420,6 +420,49 @@ body {
     flex-direction: column;
     gap: 15px;
 }
+
+.panelverificacion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.panelverificacion p {
+    margin: 0;
+    color: #c7c7c7;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.84rem;
+    letter-spacing: normal;
+    line-height: 1.5;
+}
+
+.panelverificacion strong,
+.etiquetaverificacion {
+    color: var(--gold);
+    overflow-wrap: anywhere;
+}
+
+.botonsecundarioverificacion {
+    padding: 10px;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--gold);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.botonsecundarioverificacion:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#verificacionMsg {
+    min-height: 20px;
+    color: #d6d6d6;
+}
 /* ASIGANDO PARA MARKO */
 .grilladeregistro {
     display: grid;
@@ -510,6 +553,13 @@ body {
     font-size: 0.8rem;
     color: #ccc;
     align-items: flex-start;
+}
+
+.filacheckanonimo.anonimoprofesor {
+    padding: 10px;
+    border-left: 3px solid var(--gold);
+    background: rgba(255, 204, 0, 0.08);
+    color: var(--gold);
 }
 
 .botonpaenviar {
