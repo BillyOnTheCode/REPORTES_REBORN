@@ -83,6 +83,13 @@
     font-family: 'Montserrat', sans-serif;
 }
 
+.botonesmanager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
 .explicacionseccion {
     margin: 10px 0 25px;
     color: #a3a3a3;
@@ -179,6 +186,21 @@
     font-size: 0.68rem;
     font-weight: bold;
     text-transform: uppercase;
+}
+
+.origenadmin {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 3px 6px;
+    border: 1px solid #626776;
+    color: #c8ccd6;
+    font-size: 0.62rem;
+    font-weight: bold;
+}
+
+.origenadmin.origen-profesor {
+    border-color: var(--gold);
+    color: var(--gold);
 }
 
 .fechaadmin,

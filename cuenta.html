@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="cuenta_estilos.css" />
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
-    <link rel="icon" href="Archivos/imagen/REPORTES LOGO.png" type="image/png" />
+    <link rel="icon" href="Archivos/imagen/REPORTES_LOGO.png" type="image/png" />
     
     <!-- Lógica de navegación, pestañas y RUT -->
     <script src="auth.js" defer></script>
@@ -282,12 +282,14 @@
 
       // Cargar datos del perfil
       onAuthStateChanged(auth, async (user) => {
-        if (!user) {
+        if (!user || !user.emailVerified) {
           window.location.href = "index.html";
           return;
         }
 
         try {
+          // se renueva el permiso antes de cargar el perfil
+          await user.getIdToken(true);
           const userDoc = await getDoc(doc(db, "usuarios", user.uid));
 
           if (userDoc.exists()) {
