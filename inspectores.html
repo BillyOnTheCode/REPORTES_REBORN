@@ -720,7 +720,7 @@
           texto.innerText = "Puedes ayudar nombrando nuevos inspectores, pero no puedes quitar el rol de otra cuenta.";
         }
       }
-
+//correo sip profesor o alumno
       function rolNormalDelCorreo(correo) {
         return correo.toLowerCase().endsWith("@sip.cl") ? "profesor" : "alumno";
       }
@@ -752,7 +752,6 @@
         const categorias = ["material", "convivencia", "bullying", "acoso", "otro"];
         return categorias.includes(categoria) ? categoria : "otro";
       }
-
       function obtenerFecha(fecha) {
         if (fecha && fecha.toDate) return fecha.toDate().toLocaleString("es-CL");
         return "Sin fecha";
