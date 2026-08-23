@@ -753,7 +753,9 @@
           checkAnonimo.disabled = true;
           textoAnonimo.innerText = "Los reportes de profesores siempre se publican de forma anonima.";
           if (filaAnonimo) filaAnonimo.classList.add("anonimoprofesor");
-        } else {
+        } 
+        //anonimamente reportes      
+        else {
           checkAnonimo.disabled = false;
           textoAnonimo.innerText = "Publicar de forma anonima en la tabla de reportes destacados (el correo interno siempre incluye tu identidad)";
           if (filaAnonimo) filaAnonimo.classList.remove("anonimoprofesor");
