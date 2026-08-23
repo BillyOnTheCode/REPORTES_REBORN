@@ -653,6 +653,12 @@ body {
     margin: 40px 0;
 }
 
+.boton_de_reportes {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .textodepregunta {
     margin-top: 0;
     font-family: 'Montserrat', sans-serif;
