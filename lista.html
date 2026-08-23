@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="paginaProyecto_CYBERTILINES.css" />
     <link rel="stylesheet" href="lista_estilos.css" /> <!-- Cambio de historial a Lista ; ASIGNADO PARA: NICOLAS MESA -->  
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
-    <link rel="icon" href="Archivos/imagen/REPORTES LOGO.png" type="image/png" />
+    <link rel="icon" href="Archivos/imagen/REPORTES_LOGO.png" type="image/png" />
     <script src="auth.js" defer></script>
   </head>
   <body>
@@ -40,7 +40,7 @@
     </header>
 
     <main class="contenedor historialcontenedor">
-      <div class="etiquetahistorial">SOLO SE MUESTRAN REPORTES APROBADOS</div>
+      <div class="etiquetahistorial" id="tipoHistorialTexto">SOLO SE MUESTRAN REPORTES APROBADOS</div>
 
       <section class="presentacionhistorial">
         <p class="numeroseccion">// 01</p>
@@ -103,6 +103,7 @@
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const db = getFirestore(app);
+      const CORREO_INSPECTOR_MAYOR = "rodrigo.rojas.arbayza@alumnos.sip.cl";
 
       const guardLoadingScreen = document.getElementById("guard-loading-screen");
       const listaCategorias = document.getElementById("listaCategorias");
@@ -118,12 +119,33 @@
 
       // aqui se revisa que la persona tenga una sesion iniciada
       onAuthStateChanged(auth, async (user) => {
-        if (!user) {
+        if (!user || !user.emailVerified) {
           window.location.href = "index.html";
           return;
         }
 
-        await cargarHistorial();
+        try {
+          // se renueva el permiso antes de pedir los reportes
+          await user.getIdToken(true);
+          const perfil = await getDoc(doc(db, "usuarios", user.uid));
+          const rol = perfil.exists() ? perfil.data().rol || "" : "";
+          const esInspector = rol === "inspector" || rol === "inspector_mayor" ||
+            user.email.toLowerCase() === CORREO_INSPECTOR_MAYOR;
+          const tipoCuenta = obtenerTipoCuenta(rol, user.email);
+
+          if (esInspector) {
+            document.getElementById("tipoHistorialTexto").innerText = "INSPECTORES: REPORTES APROBADOS DE ALUMNOS Y PROFESORES";
+          } else if (tipoCuenta === "profesor") {
+            document.getElementById("tipoHistorialTexto").innerText = "REPORTES APROBADOS DE PROFESORES";
+          } else {
+            document.getElementById("tipoHistorialTexto").innerText = "REPORTES APROBADOS DE ALUMNOS";
+          }
+
+          await cargarHistorial(tipoCuenta, esInspector);
+        } catch (error) {
+          console.error(error);
+          listaCategorias.innerHTML = '<p class="mensajehistorial errorhistorial">No se pudo revisar el tipo de cuenta.</p>';
+        }
         ocultarCarga();
       });
 
@@ -134,12 +156,24 @@
       });
 
       // aqui se buscan solamente los reportes que ya fueron aprobados
-      async function cargarHistorial() {
+      async function cargarHistorial(tipoCuenta, esInspector) {
         try {
-          const consulta = query(
-            collection(db, "reportes"),
-            where("estado", "==", "aprobado")
-          );
+          let consulta;
+
+          if (esInspector) {
+            consulta = query(
+              collection(db, "reportes"),
+              where("estado", "==", "aprobado")
+            );
+          } else {
+            // cada grupo pide solo los reportes que sus reglas le permiten ver
+            consulta = query(
+              collection(db, "reportes"),
+              where("estado", "==", "aprobado"),
+              where("tipoAutor", "==", tipoCuenta)
+            );
+          }
+
           const resultado = await getDocs(consulta);
           let reportes = [];
 
@@ -157,6 +191,12 @@
           console.error(error);
           listaCategorias.innerHTML = '<p class="mensajehistorial errorhistorial">No se pudo cargar el historial.</p>';
         }
+      }
+
+      function obtenerTipoCuenta(rol, correo) {
+        if (rol === "profesor") return "profesor";
+        if (rol === "alumno") return "alumno";
+        return (correo || "").toLowerCase().endsWith("@sip.cl") ? "profesor" : "alumno";
       }
 
       function mostrarCategorias(reportes) {

@@ -407,10 +407,12 @@ body {
     border: 1px solid var(--gold);
     padding: 30px;
     width: 90%;
-    max-width: 450px;
+    max-width: 470px;
     border-radius: 8px;
     position: relative;
     z-index: 2;
+    align-items: center;
+    
 }
 
 .formulariocustom {
@@ -418,17 +420,61 @@ body {
     flex-direction: column;
     gap: 15px;
 }
+
+.panelverificacion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.panelverificacion p {
+    margin: 0;
+    color: #c7c7c7;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.84rem;
+    letter-spacing: normal;
+    line-height: 1.5;
+}
+
+.panelverificacion strong,
+.etiquetaverificacion {
+    color: var(--gold);
+    overflow-wrap: anywhere;
+}
+
+.botonsecundarioverificacion {
+    padding: 10px;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--gold);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.botonsecundarioverificacion:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#verificacionMsg {
+    min-height: 20px;
+    color: #d6d6d6;
+}
 /* ASIGANDO PARA MARKO */
 .grilladeregistro {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    margin: 1%;
 }
 
 .grupodeinputs {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    
+    margin:1%;
 }
 
 .grupodeinputs label {
@@ -509,6 +555,13 @@ body {
     align-items: flex-start;
 }
 
+.filacheckanonimo.anonimoprofesor {
+    padding: 10px;
+    border-left: 3px solid var(--gold);
+    background: rgba(255, 204, 0, 0.08);
+    color: var(--gold);
+}
+
 .botonpaenviar {
     background: var(--gold);
     color: #000;
@@ -528,6 +581,11 @@ body {
 .textocentrado {
     text-align: center;
     font-size: 0.85rem;
+}
+
+.logosoport {
+    width:150px ;
+    height: 150px;
 }
 
 .textocentrado a {
@@ -817,21 +875,23 @@ body {
    VARIABLES Y ESTILOS MODO CLARO ; Encargado: JOAQUIN SALAMANCA ( 814 - 882 )
    ========================================== */
 body.light-theme {
-    --bg-dark: #f7eeda;
-    --sip-blue: #f7eeda;
-    --white: #1e293b;
-    color: #1e293b;
+    --bg-dark: #faf8f3;
+    --sip-blue: #faf8f3;
+    --white: #e4eaf3;
+    --gray: #dbb726;
+    color: rgb(175, 167, 167);
     background-color: var(--bg-dark);
 }
 
+
 body.light-theme .cabeceraprincipal {
-    background-color: #5370e2;
+    background-color: rgb(4 43 134);
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 body.light-theme .paneldenavegacion {
-    background: linear-gradient(to bottom, #5370e2, #2628b2);
-    color: #1e293b;
+    background: linear-gradient(to bottom, #3e64de, #2628b2);
+    color: #e3e7ee;
 }
 
 body.light-theme .cabeceradelmenu,body.light-theme .textodelamarca {
@@ -839,7 +899,7 @@ body.light-theme .cabeceradelmenu,body.light-theme .textodelamarca {
 }
 
 body.light-theme .enlacemenuxd {
-    color: #1e293b;
+    color: #e3e7ec;
 }
 
 body.light-theme .itemdeinfo p, 
@@ -850,26 +910,26 @@ body.light-theme .subtextoxd {
 
 body.light-theme .tarjetitamodal,
 body.light-theme .tarjetamireporte {
-    background: #3a4986;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    color: #1e293b;
+    background: rgb(17, 53, 136);
+    border: 2.68px solid #dbb726;
+    color: #dbb726;
 }
 
 body.light-theme .grupodeinputs input, 
 body.light-theme .grupodeinputs textarea,
 body.light-theme .grupodeinputs select {
-    background: #f7eeda;
+    background: #ffffff;
     color: #0f172a;
     border: 1px solid #cbd5e1;
 }
 
 body.light-theme .tabladelideres {
-    background: #f8e5bb;
+    background: #fffefa;
     border-color: #cbd5e1;
 }
 
 body.light-theme .tabladelideres th {
-    background: #5370e2;
+    background:  rgb(4 43 134);
 }
 
 body.light-theme .tabladelideres td {
@@ -878,9 +938,9 @@ body.light-theme .tabladelideres td {
 }
 
 body.light-theme .areadeaccion {
-    background: #c2cdfa;
+    background: #fcf9f4;
 }
 
 body.light-theme .tarjetamireporte {
-    background: #f7eeda;
+    background: #fcf9f4;
 }
