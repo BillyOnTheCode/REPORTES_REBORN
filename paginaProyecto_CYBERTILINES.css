@@ -129,7 +129,7 @@ body {
     border-radius: 3px;
     overflow: hidden;
 }
-
+/*Barra de progreso d la pantalla d carga*/
 .progresobarra {
     width: 100%;
     height: 100%;
