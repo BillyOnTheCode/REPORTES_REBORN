@@ -83,13 +83,6 @@
     font-family: 'Montserrat', sans-serif;
 }
 
-.botonesmanager {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 8px;
-}
-
 .explicacionseccion {
     margin: 10px 0 25px;
     color: #a3a3a3;

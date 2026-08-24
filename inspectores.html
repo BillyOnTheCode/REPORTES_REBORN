@@ -71,10 +71,7 @@
             <p>// ADMINISTRACION</p>
             <h2>TODOS LOS REPORTES</h2>
           </div>
-          <div class="botonesmanager">
-            <button id="migrarReportes" class="botoncambiartipo" style="display: none">ARREGLAR REPORTES ANTERIORES</button>
-            <button id="actualizarManager" class="botonactualizar">ACTUALIZAR</button>
-          </div>
+          <button id="actualizarManager" class="botonactualizar">ACTUALIZAR</button>
         </div>
         <p class="explicacionseccion">
           Aqui puedes revisar el estado de los reportes y eliminar los que ya no se necesiten.
@@ -166,7 +163,6 @@
           }
 
           document.getElementById("rolActualTexto").innerText = nombreDelRol(rolActual);
-          document.getElementById("migrarReportes").style.display = rolActual === "inspector_mayor" ? "block" : "none";
           actualizarTextoPermisos();
           await cargarReportesPendientes();
           await cargarCuentas();
@@ -215,57 +211,6 @@
       document.getElementById("actualizarReportes").addEventListener("click", cargarReportesPendientes);
       document.getElementById("actualizarManager").addEventListener("click", cargarTodosReportes);
       document.getElementById("actualizarCuentas").addEventListener("click", cargarCuentas);
-      document.getElementById("migrarReportes").addEventListener("click", migrarReportesAnteriores);
-
-      async function migrarReportesAnteriores() {
-        if (rolActual !== "inspector_mayor") return;
-        if (!confirm("Esto asignara alumno o profesor a los reportes anteriores. ¿Continuar?")) return;
-
-        const boton = document.getElementById("migrarReportes");
-        boton.disabled = true;
-        boton.innerText = "REVISANDO...";
-
-        try {
-          const resultado = await getDocs(collection(db, "reportes"));
-          const anteriores = resultado.docs.filter((reporteDoc) => !reporteDoc.data().tipoAutor);
-
-          if (anteriores.length === 0) {
-            alert("Todos los reportes ya tienen su tipo asignado.");
-            return;
-          }
-
-          let cantidad = 0;
-
-          for (const reporteDoc of anteriores) {
-            const datos = reporteDoc.data();
-            const correo = (datos.autorCorreo || "").toLowerCase();
-            const tipoAutor = correo.endsWith("@sip.cl") ? "profesor" : "alumno";
-            const cambios = { tipoAutor: tipoAutor };
-
-            if (tipoAutor === "profesor") {
-              // se quitan los datos que podian mostrar quien era el profesor
-              cambios.anonimo = true;
-              cambios.autorNombre = null;
-              cambios.autorUsername = null;
-              cambios.autorFotoUrl = null;
-              cambios.autorCorreo = null;
-            }
-
-            await updateDoc(reporteDoc.ref, cambios);
-            cantidad++;
-          }
-
-          alert(`${cantidad} reporte(s) anterior(es) fueron actualizados.`);
-          await cargarReportesPendientes();
-          await cargarTodosReportes();
-        } catch (error) {
-          console.error(error);
-          alert("No se pudieron actualizar los reportes anteriores.");
-        } finally {
-          boton.disabled = false;
-          boton.innerText = "ARREGLAR REPORTES ANTERIORES";
-        }
-      }
 
       // aqui se buscan los reportes que todavia no han sido revisados
       async function cargarReportesPendientes() {

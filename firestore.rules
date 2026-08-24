@@ -211,42 +211,7 @@ service cloud.firestore {
           resource.data.anonimo == false &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['autorFotoUrl']) &&
           imagenPerfilValida(request.resource.data.autorFotoUrl, 65000)
-        ) || esMigracionAnterior();
-
-      function esMigracionAnterior() {
-        let cambios = request.resource.data.diff(resource.data).affectedKeys();
-        let correoAnterior = resource.data.get('autorCorreo', '');
-        let tipoNuevo = request.resource.data.get('tipoAutor', '');
-
-        return esInspectorMayor() &&
-          !resource.data.keys().hasAny(['tipoAutor']) &&
-          (
-            (
-              tipoNuevo == 'profesor' &&
-              correoAnterior is string &&
-              correoAnterior.lower().matches('.*@sip\\.cl$') &&
-              cambios.hasOnly([
-                'tipoAutor',
-                'anonimo',
-                'autorNombre',
-                'autorUsername',
-                'autorFotoUrl',
-                'autorCorreo'
-              ]) &&
-              request.resource.data.anonimo == true &&
-              request.resource.data.autorNombre == null &&
-              request.resource.data.autorUsername == null &&
-              request.resource.data.autorFotoUrl == null &&
-              request.resource.data.autorCorreo == null
-            ) ||
-            (
-              tipoNuevo == 'alumno' &&
-              correoAnterior is string &&
-              !correoAnterior.lower().matches('.*@sip\\.cl$') &&
-              cambios.hasOnly(['tipoAutor'])
-            )
-          );
-      }
+        );
 
       // los inspectores pueden limpiar reportes de prueba o que ya no sirven
       allow delete: if esInspector();
