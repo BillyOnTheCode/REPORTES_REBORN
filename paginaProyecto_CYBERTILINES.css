@@ -121,7 +121,7 @@ body {
     color: var(--gold);
     letter-spacing: 2px;
 }
-
+/*contenedor d la barra d abajo*/
 .contenedorbarra {
     width: 250px;
     height: 6px;
