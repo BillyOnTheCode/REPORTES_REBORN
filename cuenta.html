@@ -4,11 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CONFIGURACIÓN DE CUENTA - CyberTilines</title>
-    
+    <!-- cuenta.html, sección de configuración de cuenta -->
     <!-- Hojas de estilo generales y específicas de la cuenta -->
     <link rel="stylesheet" href="paginaProyecto_CYBERTILINES.css" />
     <link rel="stylesheet" href="cuenta_estilos.css" />
-    
+    <!-- Fuente e icono de la pagina y asi :vv-->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
     <link rel="icon" href="Archivos/imagen/REPORTES_LOGO.png" type="image/png" />
     
@@ -72,7 +72,7 @@
                         <img id="accAvatarPreview" src="Archivos/imagen/acclogo.png" alt="Icono del perfil" />
                     </div>
                 </div>
-
+                <!-- Controles para actualizar imágenes de perfil -->
                 <div class="controles-imagenes-perfil">
                     <label>
                         ICONO
@@ -83,7 +83,7 @@
                         <input type="file" class="inputdearchivo" id="accBannerArchivo" accept="image/jpeg,image/png,image/webp" />
                     </label>
                 </div>
-
+                <!--campo donde de coloca tu informacion personal-->
                 <h2 style="color: var(--gold); margin-top: 0;">INFORMACIÓN PERSONAL</h2>
                 <form class="formulariocustom" id="form-actualizar-perfil">
                     <div class="grilla-perfil">
@@ -91,28 +91,28 @@
                             <label>NOMBRE COMPLETO</label>
                             <input type="text" id="accNombre" placeholder="Cargando..." readonly style="opacity: 0.7; cursor: not-allowed;" />
                         </div>
-                        <!--rut-->
+                        <!--campo donde se coloca el RUT-->
                         <div class="grupodeinputs">
                             <label>RUT REGISTRADO</label>
                             <input type="text" id="accRut" placeholder="Cargando..." readonly style="opacity: 0.7; cursor: not-allowed;" />
                         </div>
-                          <!--correo institucional-->
+                        <!--campo donde se coloca el Correo-->
                         <div class="grupodeinputs">
                             <label>CORREO INSTITUCIONAL</label>
                             <input type="email" id="accCorreo" placeholder="Cargando..." readonly style="opacity: 0.7; cursor: not-allowed;" />
                         </div>
-                          <!--nombre del usuario-->
+                        <!--campo donde se coloca el Nombre de Usuario-->
                         <div class="grupodeinputs">
                             <label>NOMBRE DE USUARIO (APODO)</label>
                             <input type="text" id="accUsername" placeholder="Ej: CyberUser99" />
                         </div>
                     </div>
-                        <!--hay biografia / presentacion hay sale linea 112-->
+                    <!--campo donde se coloca la biografia o presentacion que quieras colocar-->
                     <div class="grupodeinputs" style="margin-top: 15px;">
                         <label>BIOGRAFÍA / PRESENTACIÓN</label>
                         <textarea id="accBio" rows="3" placeholder="Escribe algo sobre ti..."></textarea>
                     </div>
-
+                    <!--boton para guardar los cambios de la zona anterior-->
                     <button type="button" class="botonpaenviar" id="btnGuardarPerfil" style="width: auto; padding: 12px 30px; align-self: flex-start;">
                         GUARDAR CAMBIOS
                     </button>
@@ -121,7 +121,7 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 2: SEGURIDAD -->
+        <!-- SECCIÓN 2: SEGURIDAD/CONTRASEÑA-->
         <section id="seccion-seguridad" class="seccion-tab">
             <div class="tarjeta-perfil">
                 <h2 style="color: var(--gold); margin-top: 0;">CAMBIAR CONTRASEÑA</h2>
@@ -131,7 +131,7 @@
                         <label>CONTRASEÑA ACTUAL</label>
                         <input type="password" id="passActual" placeholder="••••••••" required />
                     </div>
-                       <!--nueva contraseña-->
+                    <!--Apartado en el que se cambia la contraseña-->
                     <div class="grilla-perfil" style="margin-top: 10px;">
                         <div class="grupodeinputs">
                             <label>NUEVA CONTRASEÑA</label>
@@ -142,7 +142,7 @@
                             <input type="password" id="passConfirmar" placeholder="••••••••" required />
                         </div>
                     </div>
-
+                    <!-- Botón para actualizar la contraseña -->
                     <button type="button" class="botonpaenviar" id="btnCambiarPass" style="width: auto; padding: 12px 30px; align-self: flex-start; margin-top: 15px;">
                         ACTUALIZAR CONTRASEÑA
                     </button>

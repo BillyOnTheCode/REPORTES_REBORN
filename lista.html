@@ -41,7 +41,7 @@
 
     <main class="contenedor historialcontenedor">
       <div class="etiquetahistorial" id="tipoHistorialTexto">SOLO SE MUESTRAN REPORTES APROBADOS</div>
-
+<!--aqui se hacen los reportes de la comunidad sip-->
       <section class="presentacionhistorial">
         <p class="numeroseccion">// 01</p>
         <h2>REPORTES DE LA COMUNIDAD SIP</h2>
@@ -50,7 +50,7 @@
           categoria y presionar una tarjeta para ver toda su informacion.
         </p>
       </section>
-
+<!--cargando reportes hay-->
       <div id="listaCategorias" class="listacategorias">
         <p class="mensajehistorial">Cargando reportes...</p>
       </div>
@@ -252,6 +252,7 @@
         const prioridad = escapeHTML((reporte.prioridad || "sin asignar").replace("_", " "));
 //portadas titulos
         tarjeta.innerHTML = `
+
           <div class="portadareporte">
             <span>// ${escapeHTML(nombresCategorias[categoria])}</span>
             <strong>REPORTE SIP</strong>
