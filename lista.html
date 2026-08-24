@@ -41,7 +41,7 @@
 
     <main class="contenedor historialcontenedor">
       <div class="etiquetahistorial" id="tipoHistorialTexto">SOLO SE MUESTRAN REPORTES APROBADOS</div>
-
+<!--aqui se hacen los reportes de la comunidad sip-->
       <section class="presentacionhistorial">
         <p class="numeroseccion">// 01</p>
         <h2>REPORTES DE LA COMUNIDAD SIP</h2>
@@ -50,7 +50,7 @@
           categoria y presionar una tarjeta para ver toda su informacion.
         </p>
       </section>
-
+<!--cargando reportes hay-->
       <div id="listaCategorias" class="listacategorias">
         <p class="mensajehistorial">Cargando reportes...</p>
       </div>
@@ -173,7 +173,7 @@
               where("tipoAutor", "==", tipoCuenta)
             );
           }
-
+//hay son las consultas
           const resultado = await getDocs(consulta);
           let reportes = [];
 
@@ -250,8 +250,9 @@
         const autor = reporte.anonimo ? "Anonimo" : escapeHTML(reporte.autorNombre || "Usuario SIP");
         const fecha = obtenerFecha(reporte.fecha);
         const prioridad = escapeHTML((reporte.prioridad || "sin asignar").replace("_", " "));
-
+//portadas titulos
         tarjeta.innerHTML = `
+
           <div class="portadareporte">
             <span>// ${escapeHTML(nombresCategorias[categoria])}</span>
             <strong>REPORTE SIP</strong>
@@ -322,7 +323,7 @@
         detalleScreen.classList.add("is-open");
         document.body.style.overflow = "hidden";
       }
-
+//reportes archivos aqui
       async function mostrarArchivos(reporte) {
         const contenedor = document.getElementById("detalleArchivos");
         contenedor.innerHTML = '<p class="sinarchivos">Buscando imagenes...</p>';
@@ -356,7 +357,7 @@
           contenedor.innerHTML = '<p class="sinarchivos">Este reporte no tiene imagenes adjuntas.</p>';
           return;
         }
-
+//imagenes del reportes
         const tituloArchivos = document.createElement("h3");
         tituloArchivos.innerText = "IMAGENES DEL REPORTE";
         contenedor.appendChild(tituloArchivos);

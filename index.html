@@ -1,44 +1,53 @@
 <!doctype html>
 <html lang="es">
   <head>
+    <!-- Configuración técnica de la página (caracteres, diseño adaptable y fuentes) -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>REPORTES SIP - CyberTilines</title>
+<!-- Conexion con el css y asi-->
     <link rel="stylesheet" href="paginaProyecto_CYBERTILINES.css" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
+<!-- Imagen del logo de la pagina y conexion con otro CSS-->
     <link rel="icon" href="Archivos/imagen/REPORTES_LOGO.png" type="image/png">
+    <!-- Carga el script para comprobar el acceso del usuario antes de mostrar la página -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="auth.js" defer></script>
+    <!-- Fondo oscuro que aparece al abrir la barra lateral de navegación -->
   </head>
+  <!-- Panel lateral desplegable con las secciones del sitio -->
   <body>
     <div class="capaoscurapatapar" id="navOverlay"></div>
-
     <nav class="paneldenavegacion" id="navPanel" aria-label="Menú principal">
       <div class="barritadearriba"></div>
       <div class="cabeceradelmenu">
         <span>// NAVEGACIÓN</span>
+        <!-- Enlaces directos para moverse entre las distintas secciones de la plataforma -->
         <div class="titulodelmenu">
           CYBER<span class="doradito">TILINES</span>
         </div>
       </div>
+      <!--Links de las secciones de las paginas-->
       <ul class="listadelmenu">
+        <!-- Acceso restringido únicamente para cuentas con permisos de gestión -->
         <li>
           <a href="cuenta.html" class="enlacemenuxd">Cuenta<span class="flechitamenu">›</span></a>
         </li>
         <li> <!-- Cambio de historial a Lista ; ASIGNADO PARA:NICOLAS MESA (al cambiar a Lista el Historial, verifica que hasta el Historial.html tenga lo mismo Lista.html y los enlaces con lo mismo)-->
           <a href="lista.html" class="enlacemenuxd">Lista de Reportes<span class="flechitamenu">›</span></a> 
-        </li>
+        </li> <!-- Panel de administracion y/o Inspectores :3-->
         <li id="menuAdministracion" style="display: none;">
           <a href="inspectores.html" class="enlacemenuxd">Administración<span class="flechitamenu">›</span></a>
         </li>
-        <li>
+        <li><!-- Seccion de Tus reportes-->
           <a href="#" class="enlacemenuxd" id="abrirMisReportes">Tus Reportes<span class="flechitamenu">›</span></a>
         </li>
-        <li>
+        <li><!-- Seccion de el soporte-->
           <a href="#" class="enlacemenuxd" id="abrirSoporte">Soporte<span class="flechitamenu">›</span></a>
         </li>
       </ul>
-      <svg
+      <!-- poquito de decoracion tipo css y asi :vvv-->
+      <svg 
         class="decoraciondelesquina"
         viewBox="0 0 60 60"
         fill="none"
@@ -56,6 +65,7 @@
           stroke-width="3"
           stroke-linecap="square"
         />
+        <!-- Pantalla con barra de progreso mientras se comprueban las credenciales -->
         <path
           d="M 46 29 L 60 15"
           stroke="#ffcc00"
@@ -66,26 +76,31 @@
       <div class="nav-panel-footer">
         <div class="textodelamarca">CyberTilines® — Reportes SIP©</div>
       </div>
+      <!-- Bloque principal con las interfaces de acceso y registro -->
     </nav>
-
+    <!--Animacion de carga-->
     <div id="guard-loading-screen">
       <div class="titulocargando">
         SISTEMA // VERIFICANDO CREDENCIALES...
       </div>
       <div class="contenedorbarra">
+        <!-- barra de progreso que apaña al texto osiosi-->
         <div class="progresobarra"></div>
       </div>
+      <!-- Texto de datos cargados-->
       <div class="estadocargando">
         Sincronizando datos: OK!
       </div>
     </div>
-
+    <!--Fin de Animacion de carga-->
     <!-- Fondo de Login -->
     <section id="pantalla-login" class="pantallacompletalogin">
       <figure class="cajatextofondo">
+        <!-- EJEEMM... texto que ya no se mueve por culpa de RODRIGO ROJAS 😡😡😡😡😡😡-->
         <span class="textoquemueve">
           <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
           <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <!-- Campos para ingresar al sistema con correo y clave -->
           <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
           <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
           <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
@@ -99,6 +114,7 @@
           <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
         </span>
       </figure>
+<!-- Seccion para iniciar sesion osiosi-->
 
       <div class="tarjetitamodal">
         <h2 id="titulo-form">INICIAR SESIÓN</h2>
@@ -114,7 +130,7 @@
               autocomplete="new-password"
             />
           </div>
-
+          <!--Apartado de contraseñas-->
           <div class="grupodeinputs">
             <label>CONTRASEÑA</label>
             <input
@@ -122,10 +138,11 @@
               id="loginPassSip"
               placeholder="••••••••"
               required
+            
               autocomplete="new-password"
             />
           </div>
-
+<!-- Contenedor para la opcion "Recordarme"-->
           <label class="contenedorrecordar">
             <div class="checkboxcustom">
               <input type="checkbox" id="recordarme" />
@@ -133,11 +150,11 @@
             </div>
             <span>Recordarme</span>
           </label>
-
+          <!-- Boton para ingresar que se envia y asi y aja lol xdxdxd-->
           <button type="button" id="btnLogin" class="botonpaenviar">
             INGRESAR
           </button>
-
+<!-- Opcion para ir a la seccion de crear cuenta en caso de que no tengas cuenta y asi-->
           <p class="textocentrado">
             ¿Eres nuevo?
             <a href="#" id="ir-a-registro">¡Crea tu cuenta aquí!</a>
@@ -147,6 +164,7 @@
         <form class="formulariocustom" id="form-registro" style="display: none" autocomplete="off">
           <div class="grilladeregistro">
             <div class="grupodeinputs">
+  
               <!-- Cambio de espacio de caja de inputs: Marko Jaramillo ; en los chromebooks estos se sobresalen, reduse el tamaño horizontal de este sin exagerar, usa css tmb (revisa lineas 400 - 450) -->  
               <label>RUT</label>
               <input
@@ -156,7 +174,9 @@
                 required
               />
             </div>
+            <!-- Mensaje de aviso para verificar el correo electrónico institucional -->
             <div class="grupodeinputs">
+              <!--Para ingresar el correo Instucional-->
               <label>CORREO INST.</label>
               <input
                 type="email"
@@ -167,10 +187,14 @@
               />
             </div>
           </div>
+          <!-- Vista protegida que se activa solo cuando el usuario ha iniciado sesión -->
           <div class="grilladeregistro">
             <div class="grupodeinputs">
+              <!--Para ingresar datos-->
               <label>CONTRASEÑA</label>
-              <input
+              
+              <!-- Encabezado superior con menú, botones de tema y control de sesión -->
+               <input
                 type="password"
                 id="regPassSip"
                 required
@@ -197,10 +221,12 @@
           </p>
         </form>
 
+        <!-- lamentablemente un panel de verificacion todo feo y asi :Vvvv mentira esta god-->
         <div id="panel-verificacion" class="panelverificacion" style="display: none">
           <span class="etiquetaverificacion">// CONFIRMAR CORREO</span>
           <p>Enviamos un enlace de verificacion a:</p>
           <strong id="correo-verificacion">correo@sip.cl</strong>
+          <!-- Bloque informativo con la explicación y propósito de la plataforma SIP -->
           <p class="textoverificacion">Abre el correo, presiona el boton de confirmar y despues vuelve aqui.</p>
           <button type="button" id="btnYaVerifique" class="botonpaenviar">YA VERIFIQUE</button>
           <button type="button" id="btnReenviarVerificacion" class="botonsecundarioverificacion">REENVIAR CORREO</button>
@@ -222,11 +248,12 @@
               id="btnHamburger"
               aria-label="Abrir menú"
               aria-expanded="false"
-            >
+            ><!-- Icono y barra d hamburguesa, idea de marko jaramillo muito bem-->
               <span class="barritahamburguesa"></span>
               <span class="barritahamburguesa"></span>
               <span class="barritahamburguesa"></span>
             </button>
+            <!-- Area del logo y asi, donde esta el titulo d la pagina y cosotas asi -->
             <div class="areadellogo">
               <h1>REPORTES <span class="textoamarillo">SIP</span></h1>
               <p class="subtituloxd">
@@ -234,11 +261,15 @@
               </p>
             </div>
           </div>
+          <!-- Ventana emergente con el formulario para registrar un caso o problema -->
           <div style="display: flex; align-items: center; gap: 15px">
+            <!-- Boton para cerrar sesion-->
             <button id="themeBtn" class="botoncerrarsesion">Tema <i class="bi bi-sun-fill"></i> / <i class="bi bi-moon-fill"></i></button>
             <a href="cuenta.html" class="botoncuentaaesthetic">
+              <!-- Icono para acceder directamente al apartado de cuenta.html cicicicici-->
               <img src="Archivos/imagen/acclogo.png" alt="User Profile" class="iconocuenta" />
             </a>
+            <!-- Boton para cerrar sesion, o la vdd no se si es un boton, creo q si nose :v-->
             <button class="botoncerrarsesion" id="btnCerrarSesion">
               CERRAR SESIÓN
             </button>
@@ -246,30 +277,36 @@
         </div>
         <div class="lineacabecera"></div>
       </header>
-
+      <!--Fin de la cabecera-->
       <main class="contenedor">
         <section class="seccionhero">
           <div class="cajadeimagen">
             <img src="Archivos/imagen/sipcol2.jpg" alt="Preview" class="imagenpapuchadxdd" />
+            <!-- Esta es la imagen al lado de el texto de que es y quienes somos y asi-->
           </div>
 
           <div class="columnadeinfo">
             <div class="contenidodeinfo">
               <h3 class="textoamarillo">REPORTES SIP - ¿Qué es?</h3>
+              <!-- Texto de que es la pagina titulo y asi-->
 
               <div class="itemdeinfo">
                 <h4><span class="textoamarillo">01.</span> ¿Para qué sirve?</h4>
                 <p>
+                  <!-- Subtitulo de: ¿Para que sirve?-->
                   Esta plataforma ha sido diseñada para centralizar y agilizar
                   el levantamiento de incidencias técnicas. Permite a la
                   comunidad estudiantil informar sobre fallas en laboratorios,
                   equipos o infraestructura de manera formal y organizada.
+                  <!-- Descripcion de ¿Para qué sirve? -->
                 </p>
               </div>
 
               <div class="itemdeinfo">
                 <h4><span class="textoamarillo">02.</span> Guía de Uso</h4>
+                <!-- Titulo de la guia de uso-->
                 <p>
+                  <!-- Descripcion de la guia de uso :333333333 676767767676767767667677667-->
                   El proceso es intuitivo: basta con autenticarse en el sistema,
                   completar el formulario con los detalles del suceso y adjuntar
                   una evidencia visual. El equipo técnico recibirá la alerta en
@@ -279,14 +316,16 @@
 
               <div class="itemdeinfo">
                 <h4>
+               <!-- Zona con el botón de acceso directo para redactar una incidencia -->
+                <p>
                   <span class="textoamarillo">03.</span> Impacto en la Red SIP
                 </h4>
-                <p>
                   La importancia radica en mantener la continuidad educativa. Al
                   reportar activamente, garantizamos que las herramientas
                   tecnológicas de nuestros liceos estén siempre operativas para
                   el aprendizaje de excelencia.
                 </p>
+                <!-- Tabla desplegable que lista las incidencias publicadas recientemente -->
               </div>
             </div>
           </div>
@@ -299,6 +338,7 @@
             <h2>NUEVO REPORTE</h2>
             <form class="formulariocustom" id="form-reporte">
               <div class="grupodeinputs">
+                <!--aqui vab os asunto del reporte-->
                 <label>ASUNTO DEL REPORTE</label>
                 <input
                   type="text"
@@ -310,6 +350,7 @@
               <!-- aqui el usuario dice de que trata el problema -->
               <div class="grupodeinputs">
                 <label>TIPO DE PROBLEMA</label>
+                <!-- Categoria de los problemas-->
                 <select id="reporteCategoria" required>
                   <option value="">Selecciona una categoria</option>
                   <option value="material">Material institucional</option>
@@ -320,6 +361,7 @@
                 </select>
               </div>
               <div class="grupodeinputs">
+                <!-- Apartado para escribir la descripcion del reporte-->
                 <label>DESCRIPCIÓN DEL REPORTE</label>
                 <textarea
                   id="reporteDescripcion"
@@ -328,6 +370,7 @@
                   required
                 ></textarea>
               </div>
+              <!-- Imagenes o archivos adjuntos para proporcionar info con el reporte -->
               <div class="grupodeinputs">
                 <label>IMAGENES DEL REPORTE (OPCIONAL)</label>
                 <input
@@ -340,12 +383,15 @@
                 <span class="limitearchivos">Puedes elegir hasta 3 imagenes. Se reduciran antes de guardarlas.</span>
               </div>
               <div class="filacheckanonimo">
+                <!-- Casilla para publicar el reporte de forma anonima :p-->
                 <input type="checkbox" id="reporteAnonimo" />
                 <label for="reporteAnonimo" id="textoAnonimoReporte"
                   >Publicar de forma anónima en la tabla de reportes destacados (el
                   correo interno siempre incluye tu identidad)</label
                 >
+                <!-- Conexión a la base de datos de Firebase y funciones de la aplicación -->
               </div>
+              <!-- Boton para enviar el reporte ciciciic-->
               <button type="button" class="botonpaenviar" id="btnEnviarReporte">
                 ENVIAR REPORTE
               </button>
@@ -358,15 +404,20 @@
         <section class="areadeaccion">
           <img class="gifs" src="Archivos/imagen/gif1.gif" alt="gif1" width="170" height="170">
             <article class="boton_de_reportes">
+              <!-- Texto arriba del boton principal-->
                 <h2 class="textodepregunta">¿Te gustaria publicar tu reporte?</h2>
+                <!-- Boton para publicar reporte ||Boton PRINCIPAL||-->
                 <a href="#" class="botonprincipal" id="abrirReporte">¡Haz click aquí!</a>
           </article>
+          <!-- Gifs de los CyberTilines-->
           <img class="gifs" src="Archivos/imagen/gif2.gif" alt="gif2" width="170" height="170">
         </section>
 
         <section class="seccionlideres">
+          <!-- Titulo introductorio a la seccion de reportes destacados-->
   <h2>Tabla de Reportes Destacados</h2>
   <p class="subtextoxd">
+    <!-- Subtitulo de los reportes destacados-->
     Reportes destacados y subidos recientemente por la comunidad SIP.
   </p>
   
@@ -407,9 +458,8 @@
           <a href="#" class="flechaparatras" id="cerrarSoporte">← VOLVER</a>
           <h2>SOPORTE</h2>
           <div class="contenidosoporte">
-            <!-- Redireccionando imagen para que sea visible ; ASIGNADO: SAMIR PEÑA -->
-             <!-- aqui hice que se ve que hice el cambio que no se veia la imagen -->
-            <img class="avatarsoporte" src="Imagen/REPORTES LOGO.png" alt="Reportes SIP"/>
+            <!-- Redireccionando imagen para que sea visible ; ASIGNADO: SAMIR PEÑA X LISTO-->
+            <img class="avatarsoporte" src="Archivos/imagen/REPORTES_LOGO.png" alt="Reportes SIP"/>
             <div class="infosoporte">
               <h3>CYBERTILINES TEAM</h3>
               <p><strong>Teléfonos:</strong> +56 9 7221 5314 , +56 9 6340 6313</p>
@@ -452,7 +502,6 @@
         where,
         getDocs,
       } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-
       const CORREO_INSPECTOR_MAYOR = "rodrigo.rojas.arbayza@alumnos.sip.cl";
       let rolUsuarioActual = "";
       let tipoCuentaActual = "alumno";
@@ -484,7 +533,7 @@
         const apellidoFormateado = apellidoRaw.charAt(0).toUpperCase() + apellidoRaw.slice(1);
         return `${nombreFormateado} ${apellidoFormateado}`.trim();
       }
-
+      //Algunas funciones de la pagina
       document.getElementById("ir-a-registro").onclick = (e) => {
         e.preventDefault();
         document.getElementById("panel-verificacion").style.display = "none";
@@ -509,7 +558,7 @@
         const email = contenedor.querySelector("#regEmailSip").value.toLowerCase().trim();
         const pass = contenedor.querySelector("#regPassSip").value;
         const confirm = contenedor.querySelector("#regConfirmPassSip").value;
-
+        //condicionales por si los datos no son validos
         if (typeof validarRut === "function" && !validarRut(rut)) {
           msg.innerText = "Error: El RUT es inválido.";
           return;
@@ -535,7 +584,7 @@
           guardLoadingScreen.style.opacity = "1";
           guardLoadingScreen.style.visibility = "visible";
         }
-
+        //fin de condicionales
         createUserWithEmailAndPassword(auth, email, pass)
           .then(async (userCredential) => {
             const user = userCredential.user;
@@ -755,7 +804,9 @@
           checkAnonimo.disabled = true;
           textoAnonimo.innerText = "Los reportes de profesores siempre se publican de forma anonima.";
           if (filaAnonimo) filaAnonimo.classList.add("anonimoprofesor");
-        } else {
+        } 
+        //anonimamente reportes      
+        else {
           checkAnonimo.disabled = false;
           textoAnonimo.innerText = "Publicar de forma anonima en la tabla de reportes destacados (el correo interno siempre incluye tu identidad)";
           if (filaAnonimo) filaAnonimo.classList.remove("anonimoprofesor");
@@ -919,7 +970,7 @@
           setReporteMsg("Solo puedes elegir hasta 3 imagenes.", "err");
           return;
         }
-
+//imagens mas 
         for (let i = 0; i < archivosSeleccionados.length; i++) {
           const tiposPermitidos = ["image/jpeg", "image/png", "image/webp"];
 
@@ -928,7 +979,7 @@
             return;
           }
         }
-
+//enviando reporte subido 
         const btn = document.getElementById("btnEnviarReporte");
         btn.disabled = true;
         setReporteMsg("Enviando reporte...", "");
