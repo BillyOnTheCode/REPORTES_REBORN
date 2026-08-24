@@ -14,7 +14,7 @@
   display: none;
 }
 
-
+/* Contenedor universal supongo */
 * {
     box-sizing: border-box;
 }
