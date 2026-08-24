@@ -176,7 +176,7 @@
           ocultarCarga();
         }
       });
-
+      // aqui se cierra la sesion del inspector
       document.getElementById("btnCerrarSesionInspector").addEventListener("click", () => {
         signOut(auth).then(() => {
           window.location.href = "index.html";
