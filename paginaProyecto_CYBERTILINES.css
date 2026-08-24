@@ -186,7 +186,7 @@ body {
 
 .textoamarillo { color: var(--gold); }
 .textoblanco { color: var(--white); }
-
+/*Boton hamburguesa y ultimo commit, finalmente*/
 .botonhamburguesa {
     background: none;
     border: none;
