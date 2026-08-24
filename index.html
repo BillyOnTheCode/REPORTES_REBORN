@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="es">
   <head>
+    <!-- Configuración técnica de la página (caracteres, diseño adaptable y fuentes) -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>REPORTES SIP - CyberTilines</title>
@@ -9,25 +10,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
 <!-- Imagen del logo de la pagina y conexion con otro CSS-->
     <link rel="icon" href="Archivos/imagen/REPORTES_LOGO.png" type="image/png">
+    <!-- Carga el script para comprobar el acceso del usuario antes de mostrar la página -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="auth.js" defer></script>
+    <!-- Fondo oscuro que aparece al abrir la barra lateral de navegación -->
   </head>
-
-  <!--Fin de la cabeza de la pagina-->
-
+  <!-- Panel lateral desplegable con las secciones del sitio -->
   <body>
     <div class="capaoscurapatapar" id="navOverlay"></div>
-<!-- rodrigo que es ese nombre de clase w JASDJASJD-->
     <nav class="paneldenavegacion" id="navPanel" aria-label="Menú principal">
       <div class="barritadearriba"></div>
       <div class="cabeceradelmenu">
         <span>// NAVEGACIÓN</span>
+        <!-- Enlaces directos para moverse entre las distintas secciones de la plataforma -->
         <div class="titulodelmenu">
           CYBER<span class="doradito">TILINES</span>
         </div>
       </div>
       <!--Links de las secciones de las paginas-->
       <ul class="listadelmenu">
+        <!-- Acceso restringido únicamente para cuentas con permisos de gestión -->
         <li>
           <a href="cuenta.html" class="enlacemenuxd">Cuenta<span class="flechitamenu">›</span></a>
         </li>
@@ -63,6 +65,7 @@
           stroke-width="3"
           stroke-linecap="square"
         />
+        <!-- Pantalla con barra de progreso mientras se comprueban las credenciales -->
         <path
           d="M 46 29 L 60 15"
           stroke="#ffcc00"
@@ -73,6 +76,7 @@
       <div class="nav-panel-footer">
         <div class="textodelamarca">CyberTilines® — Reportes SIP©</div>
       </div>
+      <!-- Bloque principal con las interfaces de acceso y registro -->
     </nav>
     <!--Animacion de carga-->
     <div id="guard-loading-screen">
@@ -96,6 +100,7 @@
         <span class="textoquemueve">
           <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
           <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
+          <!-- Campos para ingresar al sistema con correo y clave -->
           <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
           <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
           <span>REPORTES SIP REPORTES SIP REPORTES SIP REPORTES SIP</span>
@@ -133,6 +138,7 @@
               id="loginPassSip"
               placeholder="••••••••"
               required
+            
               autocomplete="new-password"
             />
           </div>
@@ -168,6 +174,7 @@
                 required
               />
             </div>
+            <!-- Mensaje de aviso para verificar el correo electrónico institucional -->
             <div class="grupodeinputs">
               <!--Para ingresar el correo Instucional-->
               <label>CORREO INST.</label>
@@ -180,11 +187,14 @@
               />
             </div>
           </div>
+          <!-- Vista protegida que se activa solo cuando el usuario ha iniciado sesión -->
           <div class="grilladeregistro">
             <div class="grupodeinputs">
               <!--Para ingresar datos-->
               <label>CONTRASEÑA</label>
-              <input
+              
+              <!-- Encabezado superior con menú, botones de tema y control de sesión -->
+               <input
                 type="password"
                 id="regPassSip"
                 required
@@ -216,6 +226,7 @@
           <span class="etiquetaverificacion">// CONFIRMAR CORREO</span>
           <p>Enviamos un enlace de verificacion a:</p>
           <strong id="correo-verificacion">correo@sip.cl</strong>
+          <!-- Bloque informativo con la explicación y propósito de la plataforma SIP -->
           <p class="textoverificacion">Abre el correo, presiona el boton de confirmar y despues vuelve aqui.</p>
           <button type="button" id="btnYaVerifique" class="botonpaenviar">YA VERIFIQUE</button>
           <button type="button" id="btnReenviarVerificacion" class="botonsecundarioverificacion">REENVIAR CORREO</button>
@@ -250,6 +261,7 @@
               </p>
             </div>
           </div>
+          <!-- Ventana emergente con el formulario para registrar un caso o problema -->
           <div style="display: flex; align-items: center; gap: 15px">
             <!-- Boton para cerrar sesion-->
             <button id="themeBtn" class="botoncerrarsesion">Tema <i class="bi bi-sun-fill"></i> / <i class="bi bi-moon-fill"></i></button>
@@ -302,14 +314,16 @@
 
               <div class="itemdeinfo">
                 <h4>
+                                  <!-- Zona con el botón de acceso directo para redactar una incidencia -->
+                <p>
                   <span class="textoamarillo">03.</span> Impacto en la Red SIP
                 </h4>
-                <p>
                   La importancia radica en mantener la continuidad educativa. Al
                   reportar activamente, garantizamos que las herramientas
                   tecnológicas de nuestros liceos estén siempre operativas para
                   el aprendizaje de excelencia.
                 </p>
+                <!-- Tabla desplegable que lista las incidencias publicadas recientemente -->
               </div>
             </div>
           </div>
@@ -369,8 +383,7 @@
                   >Publicar de forma anónima en la tabla de reportes destacados (el
                   correo interno siempre incluye tu identidad)</label
                 >
-              
-                <!--aqui se enviara el reporte-->
+                <!-- Conexión a la base de datos de Firebase y funciones de la aplicación -->
               </div>
               <button type="button" class="botonpaenviar" id="btnEnviarReporte">
                 ENVIAR REPORTE
@@ -477,7 +490,6 @@
         where,
         getDocs,
       } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-
       const CORREO_INSPECTOR_MAYOR = "rodrigo.rojas.arbayza@alumnos.sip.cl";
       let rolUsuarioActual = "";
       let tipoCuentaActual = "alumno";
@@ -780,7 +792,9 @@
           checkAnonimo.disabled = true;
           textoAnonimo.innerText = "Los reportes de profesores siempre se publican de forma anonima.";
           if (filaAnonimo) filaAnonimo.classList.add("anonimoprofesor");
-        } else {
+        } 
+        //anonimamente reportes      
+        else {
           checkAnonimo.disabled = false;
           textoAnonimo.innerText = "Publicar de forma anonima en la tabla de reportes destacados (el correo interno siempre incluye tu identidad)";
           if (filaAnonimo) filaAnonimo.classList.remove("anonimoprofesor");
@@ -944,7 +958,7 @@
           setReporteMsg("Solo puedes elegir hasta 3 imagenes.", "err");
           return;
         }
-
+//imagens mas 
         for (let i = 0; i < archivosSeleccionados.length; i++) {
           const tiposPermitidos = ["image/jpeg", "image/png", "image/webp"];
 
@@ -953,7 +967,7 @@
             return;
           }
         }
-
+//enviando reporte subido 
         const btn = document.getElementById("btnEnviarReporte");
         btn.disabled = true;
         setReporteMsg("Enviando reporte...", "");

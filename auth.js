@@ -94,7 +94,7 @@ function initCuentaTabs() {
 
         actualizarTextoFondo(textoFondo);
     }
-
+//cuenta
     actualizarTextoFondo('CUENTA');
 
     tabCuenta.addEventListener('click', () => {
