@@ -698,7 +698,7 @@
         const categorias = ["material", "convivencia", "bullying", "acoso", "otro"];
         return categorias.includes(categoria) ? categoria : "otro";
       }
-      //fechas que se hiso el reporte
+      //fechas que se hizo el reporte
       function obtenerFecha(fecha) {
         if (fecha && fecha.toDate) return fecha.toDate().toLocaleString("es-CL");
         return "Sin fecha";
