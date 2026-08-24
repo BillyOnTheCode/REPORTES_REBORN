@@ -176,7 +176,7 @@
           ocultarCarga();
         }
       });
-
+      // aqui se cierra la sesion del inspector
       document.getElementById("btnCerrarSesionInspector").addEventListener("click", () => {
         signOut(auth).then(() => {
           window.location.href = "index.html";
@@ -249,7 +249,7 @@
           listaReportes.innerHTML = '<p class="mensajeadmin errormensaje">No se pudieron cargar los reportes.</p>';
         }
       }
-
+      // aqui se crean los reportes mediante tarjetas y se muestran en el panel de inspectores
       function crearReporte(reporte) {
         const tarjeta = document.createElement("article");
         tarjeta.className = "reporteadministracion";
@@ -480,7 +480,7 @@
           listaCuentas.innerHTML = '<p class="mensajeadmin errormensaje">No se pudieron cargar las cuentas.</p>';
         }
       }
-
+      // aqui se crean las CUENTAS mediante tarjetas y se muestran en el panel de inspectores
       function crearCuenta(cuenta) {
         const tarjeta = document.createElement("article");
         tarjeta.className = "tarjetacuentaadmin";
@@ -591,11 +591,11 @@
             rol: rolNuevo,
           });
           await cargarCuentas();
-        } catch (error) {
+          } catch (error) {
           console.error(error);
           botones.forEach((boton) => boton.disabled = false);
           alert("No se pudo cambiar el tipo de cuenta.");
-        }
+          }
       }
 
       function mostrarArchivos(reporte, contenedor) {
@@ -656,7 +656,7 @@
           boton.innerText = "NO SE PUDIERON CARGAR";
         }
       }
-
+      // aqui se actualiza el texto que explica los permisos de cada inspector
       function actualizarTextoPermisos() {
         const texto = document.getElementById("textoPermisoCuentas");
 
@@ -666,7 +666,7 @@
           texto.innerText = "Puedes ayudar nombrando nuevos inspectores, pero no puedes quitar el rol de otra cuenta.";
         }
       }
-//correo sip profesor o alumno
+      //correo sip profesor o alumno
       function rolNormalDelCorreo(correo) {
         return correo.toLowerCase().endsWith("@sip.cl") ? "profesor" : "alumno";
       }
@@ -678,14 +678,14 @@
         // esto ayuda con los reportes que se hicieron antes de guardar el tipo
         return (reporte.autorCorreo || "").toLowerCase().endsWith("@sip.cl") ? "profesor" : "alumno";
       }
-//inspectroe profesore alumnos hay 
+      //inspector profesores alumnos ahi 
       function nombreDelRol(rol) {
         if (rol === "inspector_mayor") return "INSPECTOR MAYOR";
         if (rol === "inspector") return "INSPECTOR";
         if (rol === "profesor") return "PROFESOR";
         return "ALUMNO";
       }
-//materiales como nullye  convivencia escolar entre muchos otros
+      //materiales como nullye  convivencia escolar entre muchos otros
       function nombreCategoria(categoria) {
         if (categoria === "material") return "Material institucional";
         if (categoria === "convivencia") return "Convivencia escolar";
@@ -698,7 +698,7 @@
         const categorias = ["material", "convivencia", "bullying", "acoso", "otro"];
         return categorias.includes(categoria) ? categoria : "otro";
       }
-      //fechas que se hiso el reporte
+      //fechas que se hizo el reporte
       function obtenerFecha(fecha) {
         if (fecha && fecha.toDate) return fecha.toDate().toLocaleString("es-CL");
         return "Sin fecha";
