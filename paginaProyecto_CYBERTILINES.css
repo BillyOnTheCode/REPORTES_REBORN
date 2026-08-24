@@ -233,6 +233,8 @@ body {
     transform: translateX(-5px);
 }
 
+
+/*Eliminar border y Background, ASIGNADO PARA NICOLAS MESA*/
 .botoncuentaaesthetic {
     display: flex;
     align-items: center;
@@ -777,6 +779,7 @@ body {
     border: 1px solid var(--gold, #ffcc00);
 }
 
+/*Solucionar padding a 0: Asignado para Nicolas Mesa*/
 .avatargris,
 .tabladelideres td img.avatargris {
     padding: 5px;
