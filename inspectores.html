@@ -591,11 +591,11 @@
             rol: rolNuevo,
           });
           await cargarCuentas();
-        } catch (error) {
+          } catch (error) {
           console.error(error);
           botones.forEach((boton) => boton.disabled = false);
           alert("No se pudo cambiar el tipo de cuenta.");
-        }
+          }
       }
 
       function mostrarArchivos(reporte, contenedor) {
