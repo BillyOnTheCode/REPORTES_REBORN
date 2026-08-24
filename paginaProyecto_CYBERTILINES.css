@@ -172,7 +172,7 @@ body {
     height: 2px;
     background: linear-gradient(90deg, var(--gold), transparent);
 }
-
+/*El area del logo d la cabecera*/
 .areadellogo h1 {
     font-family: 'Montserrat', sans-serif;
     margin: 0;
