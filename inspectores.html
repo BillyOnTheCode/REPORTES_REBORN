@@ -11,14 +11,15 @@
     <script src="auth.js" defer></script>
   </head>
   <body>
+    <!--Pagina de carga viendo si tienes los permisos para entrar-->
     <div id="guard-loading-screen">
       <div class="titulocargando">SISTEMA // REVISANDO PERMISOS...</div>
-      <div class="contenedorbarra">
+        <div class="contenedorbarra">
         <div class="progresobarra"></div>
       </div>
       <div class="estadocargando">Comprobando cuenta de inspector...</div>
     </div>
-
+    <!--Panel de inspectores, inicio del html-->
     <header class="cabeceraprincipal">
       <div class="contenedor contenidocabecera">
         <div class="tituloinspector">
@@ -28,7 +29,7 @@
             <p class="subtituloxd">Cyber<span class="textoblanco">Tilines</span></p>
           </div>
         </div>
-
+        <!-- Botones de acción -->
         <div class="botonesinspector">
           <span id="rolActualTexto" class="insigniarol"></span>
           <button id="themeBtn" class="botoncerrarsesion">CAMBIAR ASPECTO</button>
@@ -37,18 +38,18 @@
       </div>
       <div class="lineacabecera"></div>
     </header>
-
+    <!--aviso de que esta es informacion privada-->
     <main class="contenedor panelinspectores">
       <div class="avisoprivado">
         // ESTA INFORMACION ES PRIVADA Y SOLO LA PUEDEN VER LOS INSPECTORES
       </div>
-
+      <!-- Pestañas de navegación -->
       <nav class="pestanasinspector">
         <button id="tabReportes" class="pestanainspector activa">REPORTES PENDIENTES</button>
         <button id="tabManager" class="pestanainspector">MANAGER DE REPORTES</button>
         <button id="tabCuentas" class="pestanainspector">ADMINISTRAR INSPECTORES</button>
       </nav>
-
+      <!--indicaciones para admins-->
       <section id="seccionReportes" class="seccioninspector activa">
         <div class="encabezadoseccion">
           <div>
@@ -64,7 +65,7 @@
           <p class="mensajeadmin">Cargando reportes pendientes...</p>
         </div>
       </section>
-
+      <!--todos los reportes que han hecho saldran aqui-->
       <section id="seccionManager" class="seccioninspector">
         <div class="encabezadoseccion">
           <div>
