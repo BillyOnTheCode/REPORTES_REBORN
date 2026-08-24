@@ -81,7 +81,7 @@
           <p class="mensajeadmin">Entra a esta pestaña para cargar los reportes.</p>
         </div>
       </section>
-
+      <!-- Sección de administración de cuentas -->
       <section id="seccionCuentas" class="seccioninspector">
         <div class="encabezadoseccion">
           <div>
@@ -96,7 +96,7 @@
         </div>
       </section>
     </main>
-
+    <!--zona de scripts-->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
       import {
@@ -125,7 +125,7 @@
         messagingSenderId: "795048144847",
         appId: "1:795048144847:web:82ddeed1a837775925acba",
       };
-
+      //correo del inspector mayor que puede poner y quitar inspectores
       const CORREO_INSPECTOR_MAYOR = "rodrigo.rojas.arbayza@alumnos.sip.cl";
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
