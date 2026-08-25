@@ -151,9 +151,11 @@ body {
     color: #888;
 }
 
-/* ==========================================
-   CABECERA Y NAVEGACIÓN
-   ========================================== */
+/*
+==========================================
+CABECERA Y NAVEGACIÓN
+========================================== 
+*/
 .cabeceraprincipal {
     background-color: var(--sip-blue);
     position: sticky;
