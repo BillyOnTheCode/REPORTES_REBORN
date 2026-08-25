@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Cambio de historial a Lista ; ASIGNADO PARA: NICOLAS MESA y css tmb-->  
+  <!-- Cambio de historial a Lista ; ASIGNADO PARA: NICOLAS MESA y css tmb  LISTOO-->  
     <title>LISTA DE REPORTES - CyberTilines</title>
     <link rel="stylesheet" href="paginaProyecto_CYBERTILINES.css" />
     <link rel="stylesheet" href="lista_estilos.css" /> <!-- Cambio de historial a Lista ; ASIGNADO PARA: NICOLAS MESA -->  
@@ -108,7 +108,7 @@
       const guardLoadingScreen = document.getElementById("guard-loading-screen");
       const listaCategorias = document.getElementById("listaCategorias");
       const detalleScreen = document.getElementById("detalleReporteScreen");
-
+      //Categorias
       const nombresCategorias = {
         material: "Material institucional",
         convivencia: "Convivencia escolar",
@@ -173,7 +173,11 @@
               where("tipoAutor", "==", tipoCuenta)
             );
           }
+<<<<<<< HEAD
           //hay son las consultas
+=======
+          //ahi son las consultas
+>>>>>>> da12f321f681c2827342168e48b2fa2c566e8e21
           const resultado = await getDocs(consulta);
           let reportes = [];
 
@@ -357,7 +361,7 @@
           contenedor.innerHTML = '<p class="sinarchivos">Este reporte no tiene imagenes adjuntas.</p>';
           return;
         }
-//imagenes del reportes
+        //imagenes del reportes
         const tituloArchivos = document.createElement("h3");
         tituloArchivos.innerText = "IMAGENES DEL REPORTE";
         contenedor.appendChild(tituloArchivos);
@@ -380,7 +384,7 @@
           contenedor.appendChild(enlace);
         });
       }
-
+      //Funciones
       function cerrarDetalle() {
         detalleScreen.classList.remove("is-open");
         document.body.style.overflow = "";
