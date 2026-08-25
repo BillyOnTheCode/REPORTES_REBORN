@@ -86,7 +86,8 @@ body {
     white-space: nowrap;
     line-height: 1.3;
 }
-/*pipipi */
+/*Texto que se esta moviendo*/
+
 .textoquemueve span {
     display: block;
     animation: moveText 25s linear infinite;
