@@ -224,7 +224,7 @@
               dibujo.fillStyle = "#11131a";
               dibujo.fillRect(0, 0, ancho, alto);
               dibujo.drawImage(imagen, posicionX, posicionY, anchoDibujo, altoDibujo);
-
+              // aqui se guarda la imagen en formato jpeg y se comprime si es necesario
               let datos = lienzo.toDataURL("image/jpeg", calidad);
 
               if (new Blob([datos]).size > pesoMaximo) {
