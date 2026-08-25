@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Cambio de historial a Lista ; ASIGNADO PARA: NICOLAS MESA y css tmb-->  
+  <!-- Cambio de historial a Lista ; ASIGNADO PARA: NICOLAS MESA y css tmb  LISTOO-->  
     <title>LISTA DE REPORTES - CyberTilines</title>
     <link rel="stylesheet" href="paginaProyecto_CYBERTILINES.css" />
     <link rel="stylesheet" href="lista_estilos.css" /> <!-- Cambio de historial a Lista ; ASIGNADO PARA: NICOLAS MESA -->  
@@ -41,7 +41,7 @@
 
     <main class="contenedor historialcontenedor">
       <div class="etiquetahistorial" id="tipoHistorialTexto">SOLO SE MUESTRAN REPORTES APROBADOS</div>
-<!--aqui se hacen los reportes de la comunidad sip-->
+      <!--aqui se hacen los reportes de la comunidad sip-->
       <section class="presentacionhistorial">
         <p class="numeroseccion">// 01</p>
         <h2>REPORTES DE LA COMUNIDAD SIP</h2>
@@ -50,7 +50,7 @@
           categoria y presionar una tarjeta para ver toda su informacion.
         </p>
       </section>
-<!--cargando reportes hay-->
+      <!--cargando reportes hay-->
       <div id="listaCategorias" class="listacategorias">
         <p class="mensajehistorial">Cargando reportes...</p>
       </div>
@@ -108,7 +108,7 @@
       const guardLoadingScreen = document.getElementById("guard-loading-screen");
       const listaCategorias = document.getElementById("listaCategorias");
       const detalleScreen = document.getElementById("detalleReporteScreen");
-
+      //Categorias
       const nombresCategorias = {
         material: "Material institucional",
         convivencia: "Convivencia escolar",
@@ -173,7 +173,7 @@
               where("tipoAutor", "==", tipoCuenta)
             );
           }
-//hay son las consultas
+          //ahi son las consultas
           const resultado = await getDocs(consulta);
           let reportes = [];
 
@@ -250,7 +250,7 @@
         const autor = reporte.anonimo ? "Anonimo" : escapeHTML(reporte.autorNombre || "Usuario SIP");
         const fecha = obtenerFecha(reporte.fecha);
         const prioridad = escapeHTML((reporte.prioridad || "sin asignar").replace("_", " "));
-//portadas titulos
+        //portadas titulos
         tarjeta.innerHTML = `
 
           <div class="portadareporte">
@@ -323,7 +323,7 @@
         detalleScreen.classList.add("is-open");
         document.body.style.overflow = "hidden";
       }
-//reportes archivos aqui
+      //reportes archivos aqui
       async function mostrarArchivos(reporte) {
         const contenedor = document.getElementById("detalleArchivos");
         contenedor.innerHTML = '<p class="sinarchivos">Buscando imagenes...</p>';
@@ -357,7 +357,7 @@
           contenedor.innerHTML = '<p class="sinarchivos">Este reporte no tiene imagenes adjuntas.</p>';
           return;
         }
-//imagenes del reportes
+        //imagenes del reportes
         const tituloArchivos = document.createElement("h3");
         tituloArchivos.innerText = "IMAGENES DEL REPORTE";
         contenedor.appendChild(tituloArchivos);
@@ -380,7 +380,7 @@
           contenedor.appendChild(enlace);
         });
       }
-
+      //Funciones
       function cerrarDetalle() {
         detalleScreen.classList.remove("is-open");
         document.body.style.overflow = "";
