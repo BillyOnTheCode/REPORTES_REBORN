@@ -252,6 +252,7 @@ CABECERA Y NAVEGACIÓN
     transition: transform 0.2s ease;
 }
 
+/*FUncion del cursor a la hora de pasarlo por encima */
 .botoncuentaaesthetic:hover {
     transform: scale(1.08);
 }
