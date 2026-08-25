@@ -361,10 +361,10 @@
           }
 
           if (avatarPendiente !== null) {
-            // tambien cambia el icono de sus reportes que no son anonimos
+          // tambien cambia el icono de sus reportes que no son anonimos
             const consulta = query(collection(db, "reportes"), where("autorUID", "==", user.uid));
             const reportes = await getDocs(consulta);
-//aqui reportes anonimos 
+          //aqui reportes anonimos 
             for (const reporteDoc of reportes.docs) {
               if (reporteDoc.data().anonimo === false) {
                 await updateDoc(reporteDoc.ref, {
