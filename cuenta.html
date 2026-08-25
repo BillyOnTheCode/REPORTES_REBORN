@@ -347,7 +347,7 @@
         try {
           const avatarFinal = avatarPendiente !== null ? avatarPendiente : avatarActual;
           const bannerFinal = bannerPendiente !== null ? bannerPendiente : bannerActual;
-//usuario
+        //usuario
           await updateDoc(doc(db, "usuarios", user.uid), {
             username: username,
             bio: bio
