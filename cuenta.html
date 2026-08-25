@@ -224,7 +224,7 @@
               dibujo.fillStyle = "#11131a";
               dibujo.fillRect(0, 0, ancho, alto);
               dibujo.drawImage(imagen, posicionX, posicionY, anchoDibujo, altoDibujo);
-
+              // aqui se guarda la imagen en formato jpeg y se comprime si es necesario
               let datos = lienzo.toDataURL("image/jpeg", calidad);
 
               if (new Blob([datos]).size > pesoMaximo) {
@@ -347,7 +347,7 @@
         try {
           const avatarFinal = avatarPendiente !== null ? avatarPendiente : avatarActual;
           const bannerFinal = bannerPendiente !== null ? bannerPendiente : bannerActual;
-//usuario
+        //usuario y biografia se actualizan en la base de datos
           await updateDoc(doc(db, "usuarios", user.uid), {
             username: username,
             bio: bio
@@ -361,10 +361,10 @@
           }
 
           if (avatarPendiente !== null) {
-            // tambien cambia el icono de sus reportes que no son anonimos
+          // tambien cambia el icono de sus reportes que no son anonimos
             const consulta = query(collection(db, "reportes"), where("autorUID", "==", user.uid));
             const reportes = await getDocs(consulta);
-//aqui reportes anonimos 
+          //aqui reportes anonimos 
             for (const reporteDoc of reportes.docs) {
               if (reporteDoc.data().anonimo === false) {
                 await updateDoc(reporteDoc.ref, {
@@ -388,7 +388,7 @@
         }
       });
 
-      // Cerrar sesión
+      //Boton de cerrar sesión
       document.getElementById("btnCerrarSesionCuenta").addEventListener("click", () => {
         signOut(auth).then(() => {
           window.location.href = "index.html";
