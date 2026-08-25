@@ -250,7 +250,7 @@
         const autor = reporte.anonimo ? "Anonimo" : escapeHTML(reporte.autorNombre || "Usuario SIP");
         const fecha = obtenerFecha(reporte.fecha);
         const prioridad = escapeHTML((reporte.prioridad || "sin asignar").replace("_", " "));
-//portadas titulos
+        //portadas titulos
         tarjeta.innerHTML = `
 
           <div class="portadareporte">
