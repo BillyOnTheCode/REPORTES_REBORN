@@ -190,7 +190,7 @@ CABECERA Y NAVEGACIÓN
 
 .textoamarillo { color: var(--gold); }
 .textoblanco { color: var(--white); }
-/*Boton hamburguesa y ultimo commit, finalmente*/
+/*Boton hamburguesa*/
 .botonhamburguesa {
     background: none;
     border: none;
