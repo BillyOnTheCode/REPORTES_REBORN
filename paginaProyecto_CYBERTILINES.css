@@ -121,7 +121,7 @@ body {
     color: var(--gold);
     letter-spacing: 2px;
 }
-/*contenedor d la barra d abajo*/
+/*contenedor d la barra de abajo*/
 .contenedorbarra {
     width: 250px;
     height: 6px;
@@ -129,7 +129,7 @@ body {
     border-radius: 3px;
     overflow: hidden;
 }
-/*Barra de progreso d la pantalla d carga*/
+/*Barra de progreso de la pantalla de carga*/
 .progresobarra {
     width: 100%;
     height: 100%;
