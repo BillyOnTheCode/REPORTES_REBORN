@@ -11,7 +11,7 @@
 }
 
 ::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 /* Contenedor universal supongo */
@@ -20,7 +20,7 @@
 }
 
 ::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 /* Body y pos eso xdxd:V */
